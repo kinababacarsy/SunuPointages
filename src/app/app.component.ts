@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AssignationCarteComponent } from './assignation-carte/assignation-carte.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import { DashboardAdminComponent } from './dashboard-admin/dashboard-admin.component';
 
 
 @Component({

@@ -1,0 +1,38 @@
+:host {
+    display: block;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+
+  .navbar .nav-link {
+    color: #6c757d;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+  }
+
+  .navbar .nav-link:hover {
+    color: #17a2b8;
+  }
+
+  .badge {
+    padding: 0.5em 1em;
+  }
+
+  .badge-success {
+    background-color: #28a745;
+  }
+
+  .badge-warning {
+    background-color: #ffc107;
+    color: #000;
+  }
+
+  .badge-danger {
+    background-color: #dc3545;
+  }
+
+  @media (max-width: 768px) {
+    .card-header {
+      text-align: center;
+    }
+  }
