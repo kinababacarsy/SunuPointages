@@ -1,0 +1,93 @@
+<div class="container">
+  <div class="header">
+    <div routerLink="/departements" class="breadcrumbs">
+      <a>Départements</a> &gt; <span>Info</span>
+    </div>
+    <div class="actions">
+      <button class="import-btn">Importer CSV</button>
+      <button class="new-user-btn" (click)="openAddUserModal()">
+        + Nouveau Utilisateur
+      </button>
+    </div>
+  </div>
+  <div class="info-card">
+    <div class="info">
+      <p>
+        <span>Nom du Département :</span> {{ departement?.nom_departement }}
+      </p>
+      <p><span>Description :</span> {{ departement?.description }}</p>
+      <p>
+        <span>Date de création :</span> {{ departement?.created_at | date }}
+      </p>
+      <p><span>Nombre d'employés :</span> {{ departement?.nbre_employe }}</p>
+    </div>
+  </div>
+  <div class="search-filter">
+    <div class="search-box">
+      <input placeholder="Search" type="text" [(ngModel)]="searchTerm" />
+    </div>
+    <button class="filter-btn">Filtres</button>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" /></th>
+          <th>Nom et Prénom</th>
+          <th>Matricule</th>
+          <th>Département</th>
+          <th>Téléphone</th>
+          <th>Email</th>
+          <th>Carte</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td><input type="checkbox" /></td>
+          <td>
+            <img
+              [src]="user.photo"
+              alt="Profile picture of {{ user.nom }} {{ user.prenom }}"
+              width="40"
+              height="40"
+            />
+            {{ user.nom }} {{ user.prenom }}
+          </td>
+          <td>{{ user.matricule }}</td>
+          <td>{{ departement?.nom_departement }}</td>
+          <td>{{ user.telephone }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span
+              class="status"
+              [ngClass]="{
+                active: user.status === 'active',
+                inactive: user.status === 'inactive'
+              }"
+              >{{ user.status }}</span
+            >
+          </td>
+          <td class="actions">
+            <button class="change-dept-btn">Changer de Département</button>
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <div class="page-info"><span>Précédent</span></div>
+    <div class="page-controls">
+      <button
+        *ngFor="let page of pages"
+        [ngClass]="{ active: currentPage === page }"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+    </div>
+    <div class="page-info"><span>Suivant</span></div>
+  </div>
+</div>

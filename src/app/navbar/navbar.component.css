@@ -1,0 +1,48 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  background-color: #5dbcd2;
+  padding: 10px 20px;
+  height: 60px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .logo {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+/* Conteneur des liens de navigation (centrés) */
+.navbar .nav-links {
+  flex: 1;
+  display: flex;
+  justify-content: center; /* Centre les liens horizontalement */
+  gap: 20px; /* Espace entre les liens */
+}
+
+.navbar .nav-item {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.navbar .nav-item i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+/* Déconnexion alignée à droite */
+.navbar .logout {
+  color: red;
+}
+
+/* Image utilisateur à droite */
+.navbar .user-profile {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-left: 20px;
+}
