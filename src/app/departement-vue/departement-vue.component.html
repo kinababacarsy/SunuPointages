@@ -1,15 +1,41 @@
 <div class="container">
+  <!-- En-tête -->
   <div class="header">
-    <div routerLink="/departements" class="breadcrumbs">
-      <a>Départements</a> &gt; <span>Info</span>
+    <div class="breadcrumbs">
+      <!-- Accueil -->
+      <a href="/"> <i class="fas fa-home"></i></a>
+      &gt;
+      <!-- Départements -->
+      <a href="/departements">Départements</a>
+      &gt;
+      <!-- Info (page actuelle) -->
+      <span>Info</span>
     </div>
     <div class="actions">
-      <button class="import-btn">Importer CSV</button>
+      <input
+        type="file"
+        (change)="importCSV($event, departement.id)"
+        accept=".csv"
+        style="display: none"
+        #csvInput
+      />
+      <button class="import-btn" (click)="csvInput.click()">
+        <i class="fas fa-file-import"></i> Importer CSV
+      </button>
       <button class="new-user-btn" (click)="openAddUserModal()">
-        + Nouveau Utilisateur
+        <i class="fas fa-user-plus"></i> Nouveau Utilisateur
+      </button>
+      <button
+        class="delete-multiple-btn"
+        *ngIf="selectedUsers.length > 1"
+        (click)="openDeleteMultipleModal()"
+      >
+        <i class="fas fa-trash"></i> Supprimer la sélection
       </button>
     </div>
   </div>
+
+  <!-- Carte d'information -->
   <div class="info-card">
     <div class="info">
       <p>
@@ -19,38 +45,73 @@
       <p>
         <span>Date de création :</span> {{ departement?.created_at | date }}
       </p>
-      <p><span>Nombre d'employés :</span> {{ departement?.nbre_employe }}</p>
+      <p><span>Nombre d'employés :</span> {{ departement.nbre_employe }}</p>
     </div>
   </div>
+
+  <!-- Barre de recherche et filtres -->
   <div class="search-filter">
     <div class="search-box">
-      <input placeholder="Search" type="text" [(ngModel)]="searchTerm" />
+      <i class="fas fa-search"></i>
+      <input
+        placeholder="Rechercher par nom, prénom ou matricule"
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="filterUsers()"
+      />
     </div>
-    <button class="filter-btn">Filtres</button>
+    <div class="filters">
+      <select [(ngModel)]="sortField" (change)="sortUsers()">
+        <option value="nom">Trier par nom</option>
+        <option value="matricule">Trier par matricule</option>
+        <option value="created_at">Trier par date d'ajout</option>
+      </select>
+      <select [(ngModel)]="sortOrder" (change)="sortUsers()">
+        <option value="asc">Croissant</option>
+        <option value="desc">Décroissant</option>
+      </select>
+    </div>
   </div>
+
+  <!-- Tableau des utilisateurs -->
   <div class="table-container">
     <table>
       <thead>
         <tr>
-          <th><input type="checkbox" /></th>
+          <th>
+            <input
+              type="checkbox"
+              [checked]="selectedUsers.length === filteredUsers.length"
+              (change)="toggleAllSelection()"
+            />
+          </th>
           <th>Nom et Prénom</th>
           <th>Matricule</th>
           <th>Département</th>
           <th>Téléphone</th>
           <th>Email</th>
           <th>Carte</th>
-          <th>Action</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let user of filteredUsers">
-          <td><input type="checkbox" /></td>
           <td>
+            <input
+              type="checkbox"
+              [checked]="selectedUsers.includes(user)"
+              (change)="toggleSelection(user)"
+            />
+          </td>
+          <td>
+            <!-- Photo cliquable -->
             <img
               [src]="user.photo"
               alt="Profile picture of {{ user.nom }} {{ user.prenom }}"
               width="40"
               height="40"
+              style="cursor: pointer"
+              (click)="viewEmployeeDetails(user.id)"
             />
             {{ user.nom }} {{ user.prenom }}
           </td>
@@ -59,35 +120,124 @@
           <td>{{ user.telephone }}</td>
           <td>{{ user.email }}</td>
           <td>
-            <span
-              class="status"
-              [ngClass]="{
-                active: user.status === 'active',
-                inactive: user.status === 'inactive'
-              }"
-              >{{ user.status }}</span
-            >
+            <button class="assign-card-btn" (click)="assignCard(user)">
+              <i class="fas fa-id-card"></i>
+            </button>
           </td>
           <td class="actions">
-            <button class="change-dept-btn">Changer de Département</button>
-            <button class="edit-btn">Edit</button>
-            <button class="delete-btn">Delete</button>
+            <button class="change-dept-btn" (click)="openChangeDeptModal(user)">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+            <button class="edit-btn" (click)="editUser(user)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete-btn" (click)="openDeleteModal(user)">
+              <i class="fas fa-trash"></i>
+            </button>
+            <!-- Bouton "Voir les détails" -->
+            <button
+              class="view-details-btn"
+              (click)="viewEmployeeDetails(user.id)"
+            >
+              <i class="fas fa-eye"></i> Voir les détails
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
+
+  <!-- Pagination -->
   <div class="pagination">
-    <div class="page-info"><span>Précédent</span></div>
+    <a class="nav-button" (click)="goToPage(currentPage - 1)">Précédent</a>
     <div class="page-controls">
       <button
-        *ngFor="let page of pages"
+        *ngFor="let page of pages; let i = index"
         [ngClass]="{ active: currentPage === page }"
         (click)="goToPage(page)"
       >
         {{ page }}
       </button>
     </div>
-    <div class="page-info"><span>Suivant</span></div>
+    <a class="nav-button" (click)="goToPage(currentPage + 1)">Suivant</a>
+  </div>
+
+  <!-- Modal de confirmation de suppression -->
+  <div
+    class="modal-backdrop"
+    *ngIf="showDeleteModal || showDeleteMultipleModal"
+  >
+    <div class="modal">
+      <header>
+        <h2>
+          {{
+            showDeleteModal
+              ? "Confirmer la suppression"
+              : "Confirmer la suppression multiple"
+          }}
+        </h2>
+      </header>
+      <div class="modal-body">
+        <p *ngIf="showDeleteModal">
+          Êtes-vous sûr de vouloir supprimer cet utilisateur ?
+        </p>
+        <p *ngIf="showDeleteMultipleModal">
+          Êtes-vous sûr de vouloir supprimer les
+          {{ selectedUsers.length }} utilisateurs sélectionnés ?
+        </p>
+      </div>
+      <div class="buttons">
+        <button
+          type="button"
+          (click)="
+            showDeleteModal ? closeDeleteModal() : closeDeleteMultipleModal()
+          "
+          class="cancel"
+        >
+          ANNULER
+        </button>
+        <button
+          type="button"
+          (click)="showDeleteModal ? confirmDelete() : confirmDeleteMultiple()"
+          class="confirm"
+        >
+          CONFIRMER
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de changement de département -->
+  <div class="modal-backdrop" *ngIf="showChangeDeptModal">
+    <div class="modal">
+      <header>
+        <h2>Changer de département</h2>
+      </header>
+      <div class="modal-body">
+        <p class="current-dept">
+          Département actuel :
+          <strong>{{ userToChangeDept?.departement?.nom_departement }}</strong>
+        </p>
+        <div class="select-container">
+          <select [(ngModel)]="newDepartementId" class="styled-select">
+            <option *ngFor="let dept of departements" [value]="dept.id">
+              {{ dept.nom_departement }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="buttons">
+        <button
+          type="button"
+          (click)="closeChangeDeptModal()"
+          class="btn cancel"
+        >
+          ANNULER
+        </button>
+        <button type="button" (click)="confirmChangeDept()" class="btn confirm">
+          CONFIRMER
+        </button>
+      </div>
+    </div>
   </div>
 </div>

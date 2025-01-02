@@ -8,6 +8,7 @@ import {
   FormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router'; // Ajoutez cette ligne
 
 @Component({
   selector: 'app-cohortes',
@@ -30,9 +31,13 @@ export class CohortesComponent implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 10;
   searchQuery: string = '';
-  cohortesLoaded: boolean = false; // Ajout de cette variable
+  cohortesLoaded: boolean = false;
 
-  constructor(private cohorteService: CohorteService, private fb: FormBuilder) {
+  constructor(
+    private cohorteService: CohorteService,
+    private fb: FormBuilder,
+    private router: Router // Ajoutez cette ligne
+  ) {
     this.cohorteForm = this.fb.group({
       nom_cohorte: ['', Validators.required],
       description: ['', Validators.required],
@@ -68,7 +73,6 @@ export class CohortesComponent implements OnInit {
   filterCohortes(): void {
     console.log('filterCohortes called with query:', this.searchQuery);
     if (this.searchQuery.trim() === '') {
-      // Si la requête de recherche est vide, ne filtrez pas les cohortes
       this.cohortes = this.cohortes;
     } else {
       this.cohorteService
@@ -254,5 +258,10 @@ export class CohortesComponent implements OnInit {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
     }
+  }
+
+  // Ajoutez cette méthode pour naviguer vers la page de détails de la cohorte
+  viewCohorteDetails(cohorteId: number): void {
+    this.router.navigate(['/cohorte', cohorteId]);
   }
 }

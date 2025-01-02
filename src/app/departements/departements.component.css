@@ -153,3 +153,159 @@ td {
   background-color: #007bff;
   color: #fff;
 }
+/* Container */
+.container {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 0;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  font-size: 14px;
+  color: #555;
+}
+
+.breadcrumbs a {
+  text-decoration: none;
+  color: #2196f3;
+}
+
+.breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+/* Barre de recherche */
+.search-bar {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Actions (filtres et boutons) */
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Boutons */
+button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.filter-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.create-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.view-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.edit-btn {
+  background-color: #ff9800;
+  color: white;
+}
+
+/* Tableau */
+.table-container {
+  overflow-x: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pages {
+  display: flex;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+}
+
+.pages button {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+}
+
+.pages button.active {
+  background-color: #2196f3;
+  color: white;
+  border-color: #2196f3;
+}
+
+.nav-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

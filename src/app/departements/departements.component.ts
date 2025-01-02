@@ -121,7 +121,6 @@ export class DepartementsComponent implements OnInit {
       );
     }
   }
-
   openEditModal(departement: any): void {
     console.log(
       'Ouverture du modal de modification pour le département',

@@ -1,91 +1,89 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { DepartementService } from '../departement.service';
+import { CohorteService } from '../cohorte.service';
 import { UserService } from '../user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-departement-vue',
+  selector: 'app-cohorte-vue',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './departement-vue.component.html',
-  styleUrls: ['./departement-vue.component.css'],
+  templateUrl: './cohorte-vue.component.html',
+  styleUrls: ['./cohorte-vue.component.css'],
 })
-export class DepartementVueComponent implements OnInit {
-  departement: any; // Informations du département
-  users: any[] = []; // Liste complète des utilisateurs
-  filteredUsers: any[] = []; // Liste des utilisateurs filtrés
+export class CohorteVueComponent implements OnInit {
+  cohorte: any; // Informations de la cohorte
+  users: any[] = []; // Liste complète des apprenants
+  filteredUsers: any[] = []; // Liste des apprenants filtrés
   searchTerm: string = ''; // Terme de recherche
   currentPage: number = 1; // Page actuelle
   pages: number[] = []; // Liste des pages
   isLoading: boolean = true; // Indicateur de chargement
   errorMessage: string | null = null; // Message d'erreur
-  selectedUsers: any[] = []; // Utilisateurs sélectionnés pour la suppression multiple
+  selectedUsers: any[] = []; // Apprenants sélectionnés pour la suppression multiple
   showDeleteModal: boolean = false; // Afficher le modal de suppression unique
   showDeleteMultipleModal: boolean = false; // Afficher le modal de suppression multiple
-  showChangeDeptModal: boolean = false; // Afficher le modal de changement de département
-  userToDelete: any = null; // Utilisateur à supprimer
-  userToChangeDept: any = null; // Utilisateur à changer de département
-  newDepartementId: string = ''; // Nouveau département sélectionné
-  departements: any[] = []; // Liste des départements disponibles
+  showChangeCohorteModal: boolean = false; // Afficher le modal de changement de cohorte
+  userToDelete: any = null; // Apprenant à supprimer
+  userToChangeCohorte: any = null; // Apprenant à changer de cohorte
+  newCohorteId: string = ''; // Nouvelle cohorte sélectionnée
+  cohortes: any[] = []; // Liste des cohortes disponibles
   sortField: string = 'nom'; // Champ de tri
   sortOrder: string = 'asc'; // Ordre de tri
-  employeeCount: number = 0; // Nombre d'employés
+  apprenantCount: number = 0; // Nombre d'apprenants
 
   constructor(
     private route: ActivatedRoute,
-    private departementService: DepartementService,
+    private cohorteService: CohorteService,
     private userService: UserService,
     private router: Router // Injecter le Router
   ) {}
 
   async ngOnInit(): Promise<void> {
-    const departementId = this.route.snapshot.paramMap.get('id');
-    if (departementId) {
-      await this.loadDepartementAndUsers(departementId); // Charger les données initiales
-      this.loadDepartements();
-      this.loadEmployeeCount(departementId); // Charger le nombre d'employés
+    const cohorteId = this.route.snapshot.paramMap.get('id');
+    if (cohorteId) {
+      await this.loadCohorteAndUsers(cohorteId); // Charger les données initiales
+      this.loadCohortes();
+      this.loadApprenantCount(cohorteId); // Charger le nombre d'apprenants
     } else {
-      this.errorMessage = 'ID du département non trouvé.';
+      this.errorMessage = 'ID de la cohorte non trouvé.';
       this.isLoading = false;
     }
   }
 
-  // Méthode pour naviguer vers les détails de l'employé
-  viewEmployeeDetails(userId: string): void {
-    this.router.navigate(['/employee-details', userId]);
+  // Méthode pour naviguer vers les détails de l'apprenant
+  viewApprenantDetails(userId: string): void {
+    this.router.navigate(['/apprenant-details', userId]);
   }
 
-  // Charger le nombre d'employés dans le département
-  loadEmployeeCount(departementId: string): void {
-    this.departementService
-      .getEmployeeCountByDepartement(departementId)
-      .subscribe({
-        next: (count) => {
-          this.employeeCount = count; // Mettre à jour le nombre d'employés
-        },
-        error: (error) => {
-          console.error(
-            "Erreur lors du chargement du nombre d'employés:",
-            error
-          );
-          this.errorMessage = "Erreur lors du chargement du nombre d'employés.";
-        },
-      });
+  // Charger le nombre d'apprenants dans la cohorte
+  loadApprenantCount(cohorteId: string): void {
+    this.cohorteService.getApprenantCountByCohorte(cohorteId).subscribe({
+      next: (count) => {
+        this.apprenantCount = count; // Mettre à jour le nombre d'apprenants
+      },
+      error: (error) => {
+        console.error(
+          "Erreur lors du chargement du nombre d'apprenants:",
+          error
+        );
+        this.errorMessage = "Erreur lors du chargement du nombre d'apprenants.";
+      },
+    });
   }
 
-  // Charger les informations du département et les utilisateurs associés
-  loadDepartementAndUsers(departementId: string): void {
+  // Charger les informations de la cohorte et les apprenants associés
+  loadCohorteAndUsers(cohorteId: string): void {
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.departementService
-      .getDepartement(departementId)
-      .then((departement) => {
-        this.departement = departement;
-        this.userService.getUsersByDepartement(departementId).subscribe({
+    this.cohorteService
+      .getCohorte(cohorteId)
+      .then((cohorte) => {
+        this.cohorte = cohorte;
+        this.userService.getUsersByCohorte(cohorteId).subscribe({
           next: (users) => {
             this.users = users;
             this.filteredUsers = users;
@@ -95,7 +93,7 @@ export class DepartementVueComponent implements OnInit {
           },
           error: (error) => {
             this.errorMessage =
-              'Erreur lors du chargement des utilisateurs. Veuillez réessayer.';
+              'Erreur lors du chargement des apprenants. Veuillez réessayer.';
             this.isLoading = false;
             console.error(error);
           },
@@ -103,16 +101,16 @@ export class DepartementVueComponent implements OnInit {
       })
       .catch((error) => {
         this.errorMessage =
-          'Erreur lors du chargement du département. Veuillez réessayer.';
+          'Erreur lors du chargement de la cohorte. Veuillez réessayer.';
         this.isLoading = false;
         console.error(error);
       });
   }
 
-  // Charger la liste des départements
-  loadDepartements(): void {
-    this.departementService.getDepartements().then((departements) => {
-      this.departements = departements;
+  // Charger la liste des cohortes
+  loadCohortes(): void {
+    this.cohorteService.getCohortes().then((cohortes) => {
+      this.cohortes = cohortes;
     });
   }
 
@@ -131,7 +129,7 @@ export class DepartementVueComponent implements OnInit {
     this.filteredUsers = this.users.slice(start, end);
   }
 
-  // Filtrer les utilisateurs en fonction du terme de recherche
+  // Filtrer les apprenants en fonction du terme de recherche
   filterUsers(): void {
     this.filteredUsers = this.users.filter(
       (user) =>
@@ -143,7 +141,7 @@ export class DepartementVueComponent implements OnInit {
     this.updatePagination();
   }
 
-  // Trier les utilisateurs
+  // Trier les apprenants
   sortUsers(): void {
     this.filteredUsers.sort((a, b) => {
       const fieldA = a[this.sortField];
@@ -173,7 +171,7 @@ export class DepartementVueComponent implements OnInit {
     if (this.userToDelete) {
       this.userService.deleteUser(this.userToDelete.id).subscribe({
         next: () => {
-          // Supprimer l'utilisateur de la liste
+          // Supprimer l'apprenant de la liste
           this.users = this.users.filter(
             (user) => user.id !== this.userToDelete.id
           );
@@ -182,53 +180,53 @@ export class DepartementVueComponent implements OnInit {
           );
           this.updatePagination();
 
-          // Rafraîchir le nombre d'employés
-          this.loadEmployeeCount(this.departement.id);
+          // Rafraîchir le nombre d'apprenants
+          this.loadApprenantCount(this.cohorte.id);
 
           this.closeDeleteModal();
         },
         error: (error) => {
           this.errorMessage =
-            "Erreur lors de la suppression de l'utilisateur. Veuillez réessayer.";
+            "Erreur lors de la suppression de l'apprenant. Veuillez réessayer.";
           console.error(error);
         },
       });
     }
   }
 
-  // Ouvrir le modal de changement de département
-  openChangeDeptModal(user: any): void {
-    this.userToChangeDept = user;
-    this.newDepartementId = user.departement_id;
-    this.showChangeDeptModal = true;
+  // Ouvrir le modal de changement de cohorte
+  openChangeCohorteModal(user: any): void {
+    this.userToChangeCohorte = user;
+    this.newCohorteId = user.cohorte_id;
+    this.showChangeCohorteModal = true;
   }
 
-  // Fermer le modal de changement de département
-  closeChangeDeptModal(): void {
-    this.showChangeDeptModal = false;
-    this.userToChangeDept = null;
+  // Fermer le modal de changement de cohorte
+  closeChangeCohorteModal(): void {
+    this.showChangeCohorteModal = false;
+    this.userToChangeCohorte = null;
   }
 
-  // Confirmer le changement de département
-  confirmChangeDept(): void {
-    if (this.userToChangeDept && this.newDepartementId) {
+  // Confirmer le changement de cohorte
+  confirmChangeCohorte(): void {
+    if (this.userToChangeCohorte && this.newCohorteId) {
       this.userService
-        .updateUser(this.userToChangeDept.id, {
-          departement_id: this.newDepartementId,
+        .updateUser(this.userToChangeCohorte.id, {
+          cohorte_id: this.newCohorteId,
         })
         .subscribe({
           next: () => {
-            // Recharger les données du département et des utilisateurs
-            this.loadDepartementAndUsers(this.departement.id);
+            // Recharger les données de la cohorte et des apprenants
+            this.loadCohorteAndUsers(this.cohorte.id);
 
-            // Rafraîchir le nombre d'employés
-            this.loadEmployeeCount(this.departement.id);
+            // Rafraîchir le nombre d'apprenants
+            this.loadApprenantCount(this.cohorte.id);
 
-            this.closeChangeDeptModal();
+            this.closeChangeCohorteModal();
           },
           error: (error) => {
             this.errorMessage =
-              'Erreur lors du changement de département. Veuillez réessayer.';
+              'Erreur lors du changement de cohorte. Veuillez réessayer.';
             console.error(error);
           },
         });
@@ -251,7 +249,7 @@ export class DepartementVueComponent implements OnInit {
 
     if (
       confirm(
-        'Êtes-vous sûr de vouloir supprimer les utilisateurs sélectionnés ?'
+        'Êtes-vous sûr de vouloir supprimer les apprenants sélectionnés ?'
       )
     ) {
       const deleteRequests = this.selectedUsers.map((user) =>
@@ -260,18 +258,18 @@ export class DepartementVueComponent implements OnInit {
 
       Promise.all(deleteRequests)
         .then(() => {
-          // Recharger les données du département et des utilisateurs
-          this.loadDepartementAndUsers(this.departement.id);
+          // Recharger les données de la cohorte et des apprenants
+          this.loadCohorteAndUsers(this.cohorte.id);
 
-          // Rafraîchir le nombre d'employés
-          this.loadEmployeeCount(this.departement.id);
+          // Rafraîchir le nombre d'apprenants
+          this.loadApprenantCount(this.cohorte.id);
 
           this.selectedUsers = []; // Réinitialiser la sélection
           this.closeDeleteMultipleModal(); // Fermer le modal
         })
         .catch((error) => {
           this.errorMessage =
-            'Erreur lors de la suppression des utilisateurs. Veuillez réessayer.';
+            'Erreur lors de la suppression des apprenants. Veuillez réessayer.';
           console.error(error);
         });
     }
@@ -295,28 +293,28 @@ export class DepartementVueComponent implements OnInit {
     }
   }
 
-  // Importer des utilisateurs via un fichier CSV
-  importCSV(event: any, departement_id: string): void {
+  // Importer des apprenants via un fichier CSV
+  importCSV(event: any, cohorte_id: string): void {
     const file = event.target.files[0]; // Récupérer le fichier sélectionné
     if (file) {
       const reader = new FileReader(); // Créer un FileReader pour lire le fichier
       reader.onload = (e: any) => {
         const csvData = e.target.result; // Lire les données du fichier
-        const users = this.parseCSV(csvData); // Parser le CSV en tableau d'utilisateurs
+        const users = this.parseCSV(csvData); // Parser le CSV en tableau d'apprenants
 
-        // Appeler le service pour ajouter les utilisateurs
-        this.userService.importUsersFromCSV(file, departement_id).subscribe({
+        // Appeler le service pour ajouter les apprenants
+        this.userService.importUsersFromCSVToCohorte(file, cohorte_id).subscribe({
           next: () => {
-            // Recharger les données du département et des utilisateurs
-            this.loadDepartementAndUsers(departement_id);
+            // Recharger les données de la cohorte et des apprenants
+            this.loadCohorteAndUsers(cohorte_id);
 
-            // Rafraîchir le nombre d'employés
-            this.loadEmployeeCount(departement_id);
+            // Rafraîchir le nombre d'apprenants
+            this.loadApprenantCount(cohorte_id);
           },
           error: (error) => {
             // Gérer les erreurs
             this.errorMessage =
-              "Erreur lors de l'importation des utilisateurs. Veuillez réessayer.";
+              "Erreur lors de l'importation des apprenants. Veuillez réessayer.";
             console.error(error);
           },
         });
@@ -325,7 +323,7 @@ export class DepartementVueComponent implements OnInit {
     }
   }
 
-  // Parser un fichier CSV en tableau d'utilisateurs
+  // Parser un fichier CSV en tableau d'apprenants
   parseCSV(csvData: string): any[] {
     const lines = csvData.split('\n');
     const users = [];
@@ -340,25 +338,26 @@ export class DepartementVueComponent implements OnInit {
           telephone,
           adresse,
           photo,
-          role: role || 'employé', // Utiliser le rôle du CSV s'il existe, sinon "employé" par défaut
-          departement_id: this.departement.id,
+          role: role || 'apprenant', // Utiliser le rôle du CSV s'il existe, sinon "apprenant" par défaut
+          cohorte_id: this.cohorte.id,
         });
       }
     }
     return users;
   }
 
-  // Ouvrir un modal pour ajouter un utilisateur (à implémenter)
+  // Ouvrir un modal pour ajouter un apprenant (à implémenter)
   openAddUserModal(): void {
-    console.log("Ouvrir le modal d'ajout d'utilisateur");
+    console.log("Ouvrir le modal d'ajout d'apprenant");
   }
 
-  // Éditer un utilisateur
+  // Éditer un apprenant
   editUser(user: any): void {
-    console.log("Éditer l'utilisateur", user);
-    // Logique pour éditer un utilisateur
+    console.log("Éditer l'apprenant", user);
+    // Logique pour éditer un apprenant
   }
-  // Assigner une carte à un utilisateur
+
+  // Assigner une carte à un apprenant
   assignCard(user: any): void {
     console.log('Assigner une carte à', user);
     // Logique pour assigner une carte

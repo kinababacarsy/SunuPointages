@@ -4,6 +4,9 @@ import { CohortesComponent } from './cohortes/cohortes.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { PointageComponent } from './pointage/pointage.component';
 import { DepartementVueComponent } from './departement-vue/departement-vue.component';
+import { EmployeeDetailsComponent } from './employee-details/employee-details.component';
+import { CohorteVueComponent } from './cohorte-vue/cohorte-vue.component'; // Ajouté
+import { ApprenantDetailsComponent } from './apprenant-details/apprenant-details.component'; // Ajouté
 
 // Configuration des routes
 export const routes: Routes = [
@@ -13,5 +16,7 @@ export const routes: Routes = [
   { path: 'cohortes', component: CohortesComponent },
   { path: 'pointage', component: PointageComponent },
   { path: 'departement/:id', component: DepartementVueComponent },
-  // Ajoutez d'autres routes ici si nécessaire
+  { path: 'cohorte/:id', component: CohorteVueComponent }, // Ajouté
+  { path: 'employee-details/:id', component: EmployeeDetailsComponent },
+  { path: 'apprenant-details/:id', component: ApprenantDetailsComponent }, // Ajouté
 ];
