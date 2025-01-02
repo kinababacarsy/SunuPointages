@@ -10,10 +10,11 @@
         </div>
     </header>
 
-    <!-- Consulter la liste button -->
+
     <div class="list-button">
-        <button class="btn-consult">Consulter la liste</button>
+        <button class="btn-consult" (click)="consulterListe()">Consulter la liste</button>
     </div>
+
 
     <div class="main-content">
         <!-- Profile Card -->
@@ -70,9 +71,11 @@
         <button class="btn-open ">OUVERTURE PORTE</button>
         <button class="btn-close ">FERMETURE PORTE</button>
         <div class="logout-container">
-            <button class="btn-logout">
-                <i class="fas fa-sign-out-alt"></i>
+            <button class="btn-logout" (click)="deconnexion()">
+                <img src="deconnexion-icone.png" alt="Logout" class="logout-icon">
             </button>
         </div>
+
+
     </div>
 </div>

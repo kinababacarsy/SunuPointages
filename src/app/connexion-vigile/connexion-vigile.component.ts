@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import { Router } from '@angular/router'; // Pour la navigation après la connexion
+import { LoginService } from '../services/login.service'; // Import du LoginService
 
 @Component({
   selector: 'app-connexion-vigile',
@@ -16,12 +17,32 @@ export class ConnexionVigileComponent {
     password: '',
   };
 
+  errorMessage: string | null = null; // Variable pour afficher un message d'erreur
   showPassword = false;
   showEmailError = false;
   showPasswordError = false;
 
+  constructor(private loginService: LoginService, private router: Router) {}
+
   onSubmit() {
-    console.log('Données de connexion :', this.loginData);
+    // Appel à la méthode login du LoginService
+    this.loginService.login(this.loginData.email, this.loginData.password).subscribe(
+      (response) => {
+        // Si la connexion réussit, stocke le token dans localStorage
+        localStorage.setItem('token', response.token);
+        // Redirige l'utilisateur vers une autre page, comme le dashboard
+        this.router.navigate(['/dashboard-vigile']);
+        console.log('Utilisateur connecté');
+      },
+      (error) => {
+        // Si la connexion échoue, affiche un message d'erreur
+        if (error.status === 401) {
+          this.errorMessage = 'Email ou mot de passe incorrect';
+        } else {
+          this.errorMessage = 'Erreur de connexion, veuillez réessayer';
+        }
+      }
+    );
   }
 
   togglePasswordVisibility() {

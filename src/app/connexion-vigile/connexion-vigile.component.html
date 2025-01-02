@@ -12,6 +12,7 @@
                     L'email doit contenir un &#64;
                 </div>
             </div>
+
             <div class="form-group">
                 <label for="password"><span class="required">*</span>Mot de passe</label>
                 <div class="password-container">
@@ -26,7 +27,13 @@
                 </div>
                 <a href="#" class="forgot-password">Mot de passe oublié ?</a>
             </div>
-            <button type="submit" class="login-button" [disabled]="!loginForm.valid">
+
+            <!-- Message d'erreur générique si email ou mot de passe incorrect -->
+            <div *ngIf="errorMessage" class="error-message">
+                {{ errorMessage }}
+            </div>
+
+            <button type="submit" class="login-button" [disabled]="!loginForm.valid || showEmailError || showPasswordError">
                 Login
             </button>
         </form>

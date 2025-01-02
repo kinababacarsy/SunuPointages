@@ -140,7 +140,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 15px 0;
+    margin: 30px 0;
     padding: 10px;
     /* Ajoute du padding pour le bloc */
     border-radius: 10px;
@@ -215,13 +215,34 @@
     cursor: pointer;
 }
 
+
+/* Modifications du bouton btn-logout */
+
 .btn-logout {
     background-color: #f44336;
     color: white;
-    padding: 15px;
+    padding: 10px;
+    /* Réduit le padding du bouton */
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
+    /* Vous pouvez ajuster le rayon pour arrondir les coins */
     cursor: pointer;
+    width: 50px;
+    /* Largeur réduite du bouton */
+    height: 50px;
+    /* Hauteur réduite du bouton */
+}
+
+
+/* Modifications de l'image dans le bouton */
+
+.logout-icon {
+    width: 30px;
+    /* Réduit la largeur de l'icône */
+    height: 30px;
+    /* Réduit la hauteur de l'icône */
+    object-fit: contain;
+    /* Ajuste l'image sans déformation */
 }
 
 .logout-container {

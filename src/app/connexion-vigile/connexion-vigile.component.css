@@ -216,3 +216,20 @@ button.login-button:hover {
     margin-top: 50px;
     display: block;
 }
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.eye-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.login-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
