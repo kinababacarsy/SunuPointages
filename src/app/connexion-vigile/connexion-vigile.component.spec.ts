@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NavbarComponent } from './navbar.component';
+import { ConnexionVigileComponent } from './connexion-vigile.component';
 
-describe('NavbarComponent', () => {
-  let component: NavbarComponent;
-  let fixture: ComponentFixture<NavbarComponent>;
+describe('ConnexionVigileComponent', () => {
+  let component: ConnexionVigileComponent;
+  let fixture: ComponentFixture<ConnexionVigileComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NavbarComponent]
+      imports: [ConnexionVigileComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(NavbarComponent);
+    fixture = TestBed.createComponent(ConnexionVigileComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
