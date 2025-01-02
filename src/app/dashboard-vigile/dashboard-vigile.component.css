@@ -1,0 +1,271 @@
+.container {
+    max-width: 2000px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #E6EAF1;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #00bcd4;
+    margin-bottom: 20px;
+}
+
+.logo-img,
+.profile-img {
+    width: 100px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.title {
+    color: rgb(3, 3, 3);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.list-button {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.btn-consult {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #58B5D2;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    /* Ajout de l'ombre */
+    transition: transform 0.2s;
+    /* Transition pour l'effet au survol */
+}
+
+.btn-consult:hover {
+    transform: translateY(-3px);
+    /* Légère élévation au survol */
+}
+
+.main-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+    align-items: flex-start;
+}
+
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(88, 181, 210, 0.5);
+    width: 450px;
+    height: 500px;
+    max-width: 500px;
+}
+
+.profile-image img {
+    width: 280px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.control-card {
+    background: white;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(88, 181, 210, 0.5);
+    width: 600px;
+    /* Augmentez la largeur */
+    height: 300px;
+    /* Augmentez la hauteur selon vos besoins */
+    max-width: 600px;
+    /* Limite de largeur maximale */
+    margin-left: 50px;
+    /* Gardez l'espace à gauche */
+    align-self: center;
+    text-align: center;
+    /* Centre le texte dans la carte */
+}
+
+.control-card h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.5em;
+    /* Taille du titre */
+    border-bottom: 1px solid #9e9d9d;
+    /* Trait fin en bas */
+    padding-bottom: 5px;
+    /* Espacement entre le texte et le trait */
+}
+
+.control-card h2::after {
+    content: '';
+    display: block;
+    width: 100%;
+    /* Largeur du trait */
+    height: 1px;
+    /* Épaisseur du trait */
+    background-color: #00bcd4;
+    /* Couleur du trait */
+    position: absolute;
+    bottom: 0;
+    /* Positionné en bas du titre */
+    left: 0;
+    /* Aligné à gauche */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    /* Ombre portée */
+}
+
+.bold {
+    font-weight: bold;
+    /* Applique le style gras */
+}
+
+.status {
+    margin-left: -260px;
+    /* Réduit l'espace à gauche de "En attente" */
+    /* Optionnel : styliser "En attente" */
+}
+
+.control-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+    padding: 10px;
+    /* Ajoute du padding pour le bloc */
+    border-radius: 10px;
+    /* Coins arrondis */
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    /* Fond légèrement différent */
+}
+
+.control-info {
+    padding: 5px;
+}
+
+.profile-info {
+    background: white;
+    width: 250px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2), inset 0 -4px 6px rgba(58, 57, 57, 0.473);
+}
+
+.info-item {
+    margin: 10px 0;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.status-icons {
+    display: flex;
+    gap: 10px;
+}
+
+.success {
+    color: green;
+}
+
+.error {
+    color: red;
+}
+
+.bottom-buttons {
+    display: flex;
+    justify-content: center;
+    /* Centre les boutons ouverture et fermeture */
+    align-items: center;
+    /* Centre verticalement */
+    margin-top: 40px;
+    /* Espace au-dessus des boutons */
+    position: relative;
+    /* Pour positionner le bouton logout */
+    gap: 165px;
+    /* Espace entre les boutons */
+}
+
+.btn-open {
+    background-color: #B2FF36;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.btn-close {
+    background-color: #FF3939;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.btn-logout {
+    background-color: #f44336;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.logout-container {
+    position: absolute;
+    /* Positionne le bouton logout à droite */
+    right: 0;
+    /* Aligne à droite */
+}
+
+.small-btn {
+    background-color: #f0f0f0;
+    /* Couleur de fond */
+    border: none;
+    /* Supprime la bordure */
+    border-radius: 10px;
+    /* Coins arrondis */
+    padding: 0;
+    /* Enlève le padding */
+    margin-left: -270px;
+    /* Réduction de l'espace entre les boutons */
+    cursor: pointer;
+    /* Curseur pointer */
+    display: flex;
+    /* Affiche les éléments en flex */
+    align-items: center;
+    /* Centre verticalement */
+    justify-content: center;
+    /* Centre horizontalement */
+    width: 50px;
+    /* Largeur du bouton */
+    height: 50px;
+    /* Hauteur du bouton */
+}
+
+.small-btn:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    /* Ombre au survol */
+}
+
+.btn-icon {
+    width: 100%;
+    /* L'image prend toute la largeur */
+    height: 100%;
+    /* L'image prend toute la hauteur */
+    object-fit: cover;
+    /* Assure que l'image est bien ajustée */
+}
