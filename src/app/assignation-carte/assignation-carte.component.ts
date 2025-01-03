@@ -1,37 +1,59 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
-
+import { AssignationCarteService } from '../services/assignation-carte.service';
 @Component({
   selector: 'app-assignation-carte',
-  imports: [CommonModule, RouterLink, FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './assignation-carte.component.html',
-  styleUrl: './assignation-carte.component.css'
+  styleUrls: ['./assignation-carte.component.css'],
 })
 export class AssignationCarteComponent {
-
-
   cardData = {
     fullName: 'Satorou Gojo',
     matricule: 'APP001',
     cardNumber: '',
-    assignmentDate: '12/10/2024'
+    assignmentDate: new Date().toLocaleDateString(),
   };
 
-  scanRFID() {
-    // Logique pour scanner la carte RFID
-    console.log('Scanning RFID...');
-  }
+  message = '';
+  cardStatus = '';
 
-  cancelAssignment() {
-    // Logique pour annuler
-    console.log('Assignment cancelled');
+  constructor(private AssignationCarteService: AssignationCarteService) {}
+
+  scanRFID() {
+    // Simule le scan et vérifie l'état de la carte
+    this.AssignationCarteService.verifierEtatCarte(this.cardData.cardNumber).subscribe(
+      (response) => {
+        this.message = response.message;
+        this.cardStatus = 'active';
+      },
+      (error) => {
+        this.message = error.error.message || 'Erreur lors de la vérification.';
+        this.cardStatus = 'inactive';
+      }
+    );
   }
 
   confirmAssignment() {
-    // Logique pour confirmer
-    console.log('Assignment confirmed');
+    // Assigne la carte à l'utilisateur
+    const userId = '123'; // Remplace par l'ID réel de l'utilisateur
+    this.AssignationCarteService.assignerCarte(userId, this.cardData.cardNumber).subscribe(
+      (response) => {
+        this.message = 'Carte assignée avec succès !';
+        console.log(response);
+      },
+      (error) => {
+        this.message = error.error.message || 'Erreur lors de l\'assignation.';
+      }
+    );
+  }
+
+  cancelAssignment() {
+    // Réinitialise les données du formulaire
+    this.cardData.cardNumber = '';
+    this.message = 'Assignation annulée.';
+    this.cardStatus = '';
   }
 }

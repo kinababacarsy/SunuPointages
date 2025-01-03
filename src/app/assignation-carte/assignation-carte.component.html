@@ -1,44 +1,49 @@
-<!-- card-assignment.component.html -->
 <div class="app-container">
-    
-    <main class="main-content">
-      <div class="card">
-        <h2 class="card-title">Assignation de carte</h2>
-        
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Nom complet</label>
-            <input type="text" value="Satorou Gojo" readonly class="form-control">
-          </div>
-          
-          <div class="form-group">
-            <label>Matricule</label>
-            <input type="text" value="APP001" readonly class="form-control">
-          </div>
-          
-          <div class="form-group">
-            <label>Numero de carte</label>
-            <input type="text" placeholder="Scanner pour recuperer" class="form-control">
-            <button class="btn btn-scanner">Scanner RFID</button>
-          </div>
-          
-          <div class="form-group">
-            <label>Date d'assignation</label>
-            <input type="text" value="12/10/2024" readonly class="form-control">
-          </div>
+  <main class="main-content">
+    <div class="card">
+      <h2 class="card-title">Assignation de carte</h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nom complet</label>
+          <input type="text" [value]="cardData.fullName" readonly class="form-control">
         </div>
-  
-        <div class="card-status">
-          <label>Etat de la carte</label>
-          <div class="status-icon">
-            <span class="checkmark">✓</span>
-          </div>
+
+        <div class="form-group">
+          <label>Matricule</label>
+          <input type="text" [value]="cardData.matricule" readonly class="form-control">
         </div>
-  
-        <div class="button-group">
-          <button class="btn btn-cancel">Annuler</button>
-          <button class="btn btn-confirm">Confirmer l'assignation</button>
+
+        <div class="form-group">
+          <label>Numéro de carte</label>
+          <input
+            type="text"
+            [(ngModel)]="cardData.cardNumber"
+            placeholder="Scanner pour récupérer"
+            class="form-control">
+          <button (click)="scanRFID()" class="btn btn-scanner">Scanner RFID</button>
+        </div>
+
+        <div class="form-group">
+          <label>Date d'assignation</label>
+          <input type="text" [value]="cardData.assignmentDate" readonly class="form-control">
         </div>
       </div>
-    </main>
-  </div>
+
+      <div class="card-status">
+        <label>État de la carte</label>
+        <div class="status-icon" [class.active]="cardStatus === 'active'" [class.inactive]="cardStatus === 'inactive'">
+          <span class="checkmark" *ngIf="cardStatus === 'active'">✓</span>
+          <span class="cross" *ngIf="cardStatus === 'inactive'">✗</span>
+        </div>
+      </div>
+
+      <p class="message">{{ message }}</p>
+
+      <div class="button-group">
+        <button (click)="cancelAssignment()" class="btn btn-cancel">Annuler</button>
+        <button (click)="confirmAssignment()" class="btn btn-confirm">Confirmer l'assignation</button>
+      </div>
+    </div>
+  </main>
+</div>
