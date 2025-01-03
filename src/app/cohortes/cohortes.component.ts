@@ -32,11 +32,13 @@ export class CohortesComponent implements OnInit {
   itemsPerPage: number = 10;
   searchQuery: string = '';
   cohortesLoaded: boolean = false;
+  errorMessage: string | null = null;
+  editErrorMessage: string | null = null;
 
   constructor(
     private cohorteService: CohorteService,
     private fb: FormBuilder,
-    private router: Router // Ajoutez cette ligne
+    private router: Router
   ) {
     this.cohorteForm = this.fb.group({
       nom_cohorte: ['', Validators.required],
@@ -56,6 +58,7 @@ export class CohortesComponent implements OnInit {
     }
   }
 
+  // Charge la liste des cohortes
   loadCohortes(): void {
     console.log('loadCohortes called');
     this.cohorteService
@@ -70,6 +73,7 @@ export class CohortesComponent implements OnInit {
       });
   }
 
+  // Filtre les cohortes en fonction de la recherche
   filterCohortes(): void {
     console.log('filterCohortes called with query:', this.searchQuery);
     if (this.searchQuery.trim() === '') {
@@ -90,35 +94,50 @@ export class CohortesComponent implements OnInit {
     }
   }
 
+  // Ouvre le modal de création
   openCreateModal(): void {
     console.log('Ouverture du modal de création');
     this.showModal = true;
   }
 
+  // Ferme le modal de création
   closeModal(): void {
     console.log('Fermeture du modal de création');
     this.showModal = false;
     this.cohorteForm.reset();
   }
 
+  // Crée une nouvelle cohorte
   createCohorte(event: Event): void {
     event.preventDefault();
     if (this.cohorteForm.valid) {
       this.cohorteService
         .createCohorte(this.cohorteForm.value)
-        .then((response) => {
+        .then((response: any) => {
           console.log('Cohorte créée avec succès', response);
           this.loadCohortes();
           this.closeModal();
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('Erreur lors de la création de la cohorte', error);
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors &&
+            error.response.data.errors.nom_cohorte
+          ) {
+            this.errorMessage = error.response.data.errors.nom_cohorte[0];
+            this.cohorteForm.get('nom_cohorte')?.setErrors({ unique: true });
+          } else {
+            this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+          }
         });
     } else {
       console.error('Formulaire de création invalide', this.cohorteForm.errors);
     }
   }
 
+  // Ouvre le modal de modification
   openEditModal(cohorte: any): void {
     console.log('Ouverture du modal de modification pour la cohorte', cohorte);
     this.cohorteToEdit = cohorte;
@@ -129,6 +148,7 @@ export class CohortesComponent implements OnInit {
     this.showEditModal = true;
   }
 
+  // Ferme le modal de modification
   closeEditModal(): void {
     console.log('Fermeture du modal de modification');
     this.showEditModal = false;
@@ -136,18 +156,33 @@ export class CohortesComponent implements OnInit {
     this.editCohorteForm.reset();
   }
 
+  // Met à jour une cohorte
   updateCohorte(event: Event): void {
     event.preventDefault();
     if (this.editCohorteForm.valid && this.cohorteToEdit) {
       this.cohorteService
         .updateCohorte(this.cohorteToEdit.id, this.editCohorteForm.value)
-        .then((response) => {
+        .then((response: any) => {
           console.log('Cohorte mise à jour avec succès', response);
           this.loadCohortes();
           this.closeEditModal();
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('Erreur lors de la mise à jour de la cohorte', error);
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors &&
+            error.response.data.errors.nom_cohorte
+          ) {
+            this.editErrorMessage = error.response.data.errors.nom_cohorte[0];
+            this.editCohorteForm
+              .get('nom_cohorte')
+              ?.setErrors({ unique: true });
+          } else {
+            this.editErrorMessage =
+              'Une erreur est survenue. Veuillez réessayer.';
+          }
         });
     } else {
       console.error(
@@ -157,20 +192,54 @@ export class CohortesComponent implements OnInit {
     }
   }
 
+  // Ouvre le modal de suppression
   openDeleteModal(cohorte: any): void {
     console.log('Ouverture du modal de suppression pour la cohorte', cohorte);
     this.cohorteToDelete = cohorte;
     this.showDeleteModal = true;
   }
 
+  // Ferme le modal de suppression
   closeDeleteModal(): void {
     console.log('Fermeture du modal de suppression');
     this.showDeleteModal = false;
     this.cohorteToDelete = null;
   }
 
+  // Ouvre le modal de suppression multiple
+  openDeleteMultipleModal(): void {
+    console.log('Ouverture du modal de suppression multiple');
+    this.showDeleteMultipleModal = true;
+  }
+
+  // Ferme le modal de suppression multiple
+  closeDeleteMultipleModal(): void {
+    console.log('Fermeture du modal de suppression multiple');
+    this.showDeleteMultipleModal = false;
+  }
+
+  // Vérifie si une cohorte peut être supprimée
+  canDeleteCohorte(cohorte: any): boolean {
+    return cohorte && cohorte.users && cohorte.users.length === 0;
+  }
+
+  // Vérifie si toutes les cohortes sélectionnées peuvent être supprimées
+  canDeleteSelectedCohortes(): boolean {
+    return this.selectedCohortes.every((cohorte) =>
+      this.canDeleteCohorte(cohorte)
+    );
+  }
+
+  // Vérifie si une cohorte sélectionnée contient des apprenants
+  hasApprenantsInSelectedCohortes(): boolean {
+    return this.selectedCohortes.some(
+      (cohorte) => cohorte.users && cohorte.users.length > 0
+    );
+  }
+
+  // Confirme la suppression d'une cohorte
   confirmDelete(): void {
-    if (this.cohorteToDelete) {
+    if (this.cohorteToDelete && this.canDeleteCohorte(this.cohorteToDelete)) {
       this.cohorteService
         .deleteCohorte(this.cohorteToDelete.id)
         .then((response) => {
@@ -181,35 +250,37 @@ export class CohortesComponent implements OnInit {
         .catch((error) => {
           console.error('Erreur lors de la suppression de la cohorte', error);
         });
+    } else {
+      console.log(
+        'Cette cohorte contient des apprenants, elle ne peut pas être supprimée.'
+      );
     }
   }
 
-  openDeleteMultipleModal(): void {
-    console.log('Ouverture du modal de suppression multiple');
-    this.showDeleteMultipleModal = true;
-  }
-
-  closeDeleteMultipleModal(): void {
-    console.log('Fermeture du modal de suppression multiple');
-    this.showDeleteMultipleModal = false;
-  }
-
+  // Confirme la suppression multiple de cohortes
   confirmDeleteMultiple(): void {
-    this.selectedCohortes.forEach((cohorte) => {
-      this.cohorteService
-        .deleteCohorte(cohorte.id)
-        .then((response) => {
-          console.log('Cohorte supprimée avec succès', response);
-          this.loadCohortes();
-        })
-        .catch((error) => {
-          console.error('Erreur lors de la suppression de la cohorte', error);
-        });
-    });
-    this.selectedCohortes = [];
-    this.closeDeleteMultipleModal();
+    if (this.canDeleteSelectedCohortes()) {
+      this.selectedCohortes.forEach((cohorte) => {
+        this.cohorteService
+          .deleteCohorte(cohorte.id)
+          .then((response) => {
+            console.log('Cohorte supprimée avec succès', response);
+            this.loadCohortes();
+          })
+          .catch((error) => {
+            console.error('Erreur lors de la suppression de la cohorte', error);
+          });
+      });
+      this.selectedCohortes = [];
+      this.closeDeleteMultipleModal();
+    } else {
+      console.log(
+        'Une ou plusieurs cohortes sélectionnées contiennent des apprenants, elles ne peuvent pas être supprimées.'
+      );
+    }
   }
 
+  // Ajoute ou retire une cohorte de la sélection
   toggleSelection(cohorte: any): void {
     const index = this.selectedCohortes.indexOf(cohorte);
     if (index > -1) {
@@ -219,6 +290,7 @@ export class CohortesComponent implements OnInit {
     }
   }
 
+  // Sélectionne ou désélectionne toutes les cohortes
   toggleAllSelection(): void {
     const allSelected = this.cohortes.every((cohorte) => cohorte.selected);
     this.cohortes.forEach((cohorte) => {
@@ -227,6 +299,7 @@ export class CohortesComponent implements OnInit {
     this.selectedCohortes = allSelected ? [] : this.cohortes;
   }
 
+  // Ouvre le modal de suppression multiple pour les cohortes sélectionnées
   deleteSelectedCohortes(): void {
     console.log(
       'Ouverture du modal de suppression multiple pour les cohortes sélectionnées',
@@ -235,6 +308,7 @@ export class CohortesComponent implements OnInit {
     this.openDeleteMultipleModal();
   }
 
+  // Recherche des cohortes
   searchCohortes(event: Event): void {
     const target = event.target as HTMLInputElement;
     if (target) {
@@ -244,6 +318,7 @@ export class CohortesComponent implements OnInit {
     }
   }
 
+  // Pagination
   get paginatedCohortes(): any[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
@@ -260,7 +335,7 @@ export class CohortesComponent implements OnInit {
     }
   }
 
-  // Ajoutez cette méthode pour naviguer vers la page de détails de la cohorte
+  // Navigue vers la page de détails de la cohorte
   viewCohorteDetails(cohorteId: number): void {
     this.router.navigate(['/cohorte', cohorteId]);
   }

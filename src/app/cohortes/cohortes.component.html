@@ -88,6 +88,7 @@
 </div>
 
 <!-- Modaux (inchangés) -->
+<!-- cohortes.component.html -->
 <div class="modal-backdrop" *ngIf="showModal">
   <div class="modal">
     <header>
@@ -100,7 +101,16 @@
         id="cohorte-name"
         formControlName="nom_cohorte"
         placeholder="Entrez un nom"
+        [ngClass]="{
+          'error-input': cohorteForm.get('nom_cohorte')?.hasError('unique')
+        }"
       />
+      <div
+        *ngIf="cohorteForm.get('nom_cohorte')?.hasError('unique')"
+        class="error-message"
+      >
+        {{ errorMessage }}
+      </div>
       <label for="description">Description</label>
       <textarea
         id="description"
@@ -129,7 +139,16 @@
         id="edit-cohorte-name"
         formControlName="nom_cohorte"
         placeholder="Entrez un nom"
+        [ngClass]="{
+          'error-input': editCohorteForm.get('nom_cohorte')?.hasError('unique')
+        }"
       />
+      <div
+        *ngIf="editCohorteForm.get('nom_cohorte')?.hasError('unique')"
+        class="error-message"
+      >
+        {{ editErrorMessage }}
+      </div>
       <label for="edit-description">Description</label>
       <textarea
         id="edit-description"
@@ -158,15 +177,27 @@
       </h2>
     </header>
     <div class="modal-body">
-      <p *ngIf="showDeleteModal">
+      <!-- Message pour la suppression d'une seule cohorte -->
+      <p *ngIf="showDeleteModal && canDeleteCohorte(cohorteToDelete)">
         Êtes-vous sûr de vouloir supprimer cette cohorte ?
       </p>
-      <p *ngIf="showDeleteMultipleModal">
+      <p *ngIf="showDeleteModal && !canDeleteCohorte(cohorteToDelete)">
+        Cette cohorte contient des apprenants, il est impossible de la
+        supprimer.
+      </p>
+
+      <!-- Message pour la suppression multiple de cohortes -->
+      <p *ngIf="showDeleteMultipleModal && canDeleteSelectedCohortes()">
         Êtes-vous sûr de vouloir supprimer les
         {{ selectedCohortes.length }} cohortes sélectionnées ?
       </p>
+      <p *ngIf="showDeleteMultipleModal && hasApprenantsInSelectedCohortes()">
+        Une ou plusieurs cohortes sélectionnées contiennent des apprenants, il
+        est impossible de les supprimer.
+      </p>
     </div>
     <div class="buttons">
+      <!-- Bouton Annuler -->
       <button
         type="button"
         (click)="
@@ -176,7 +207,13 @@
       >
         ANNULER
       </button>
+
+      <!-- Bouton Confirmer (affiché uniquement si la suppression est autorisée) -->
       <button
+        *ngIf="
+          (showDeleteModal && canDeleteCohorte(cohorteToDelete)) ||
+          (showDeleteMultipleModal && canDeleteSelectedCohortes())
+        "
         type="button"
         (click)="showDeleteModal ? confirmDelete() : confirmDeleteMultiple()"
         class="confirm"

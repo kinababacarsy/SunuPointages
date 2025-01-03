@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { DepartementsComponent } from './departements/departements.component';
 import { CohortesComponent } from './cohortes/cohortes.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { DashboardAdminComponent } from './dashboard-admin/dashboard-admin.component';
 import { PointageComponent } from './pointage/pointage.component';
 import { DepartementVueComponent } from './departement-vue/departement-vue.component';
 import { EmployeeDetailsComponent } from './employee-details/employee-details.component';
@@ -11,7 +11,7 @@ import { ApprenantDetailsComponent } from './apprenant-details/apprenant-details
 // Configuration des routes
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
+  { path: 'dashboard-admin', component: DashboardAdminComponent },
   { path: 'departements', component: DepartementsComponent },
   { path: 'cohortes', component: CohortesComponent },
   { path: 'pointage', component: PointageComponent },

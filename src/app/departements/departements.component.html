@@ -92,7 +92,7 @@
   </div>
 </div>
 
-<!-- Modaux (inchangés) -->
+<!-- departement.component.html -->
 <div class="modal-backdrop" *ngIf="showModal">
   <div class="modal">
     <header>
@@ -105,7 +105,18 @@
         id="department-name"
         formControlName="nom_departement"
         placeholder="Entrez un nom"
+        [ngClass]="{
+          'error-input': departmentForm
+            .get('nom_departement')
+            ?.hasError('unique')
+        }"
       />
+      <div
+        *ngIf="departmentForm.get('nom_departement')?.hasError('unique')"
+        class="error-message"
+      >
+        {{ errorMessage }}
+      </div>
       <label for="description">Description</label>
       <textarea
         id="description"
@@ -137,7 +148,18 @@
         id="edit-department-name"
         formControlName="nom_departement"
         placeholder="Entrez un nom"
+        [ngClass]="{
+          'error-input': editDepartmentForm
+            .get('nom_departement')
+            ?.hasError('unique')
+        }"
       />
+      <div
+        *ngIf="editDepartmentForm.get('nom_departement')?.hasError('unique')"
+        class="error-message"
+      >
+        {{ editErrorMessage }}
+      </div>
       <label for="edit-description">Description</label>
       <textarea
         id="edit-description"

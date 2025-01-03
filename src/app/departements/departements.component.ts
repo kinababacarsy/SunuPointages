@@ -32,6 +32,8 @@ export class DepartementsComponent implements OnInit {
   itemsPerPage: number = 10;
   searchQuery: string = '';
   departementsLoaded: boolean = false;
+  errorMessage: string | null = null;
+  editErrorMessage: string | null = null;
 
   constructor(
     private departementService: DepartementService,
@@ -95,24 +97,31 @@ export class DepartementsComponent implements OnInit {
     this.showModal = true;
   }
 
-  closeModal(): void {
-    console.log('Fermeture du modal de création');
-    this.showModal = false;
-    this.departmentForm.reset();
-  }
-
   createDepartement(event: Event): void {
     event.preventDefault();
     if (this.departmentForm.valid) {
       this.departementService
         .createDepartement(this.departmentForm.value)
-        .then((response) => {
+        .then((response: any) => {
           console.log('Département créé avec succès', response);
           this.loadDepartements();
           this.closeModal();
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('Erreur lors de la création du département', error);
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors &&
+            error.response.data.errors.nom_departement
+          ) {
+            this.errorMessage = error.response.data.errors.nom_departement[0];
+            this.departmentForm
+              .get('nom_departement')
+              ?.setErrors({ unique: true });
+          } else {
+            this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+          }
         });
     } else {
       console.error(
@@ -121,6 +130,7 @@ export class DepartementsComponent implements OnInit {
       );
     }
   }
+
   openEditModal(departement: any): void {
     console.log(
       'Ouverture du modal de modification pour le département',
@@ -149,13 +159,28 @@ export class DepartementsComponent implements OnInit {
           this.departementToEdit.id,
           this.editDepartmentForm.value
         )
-        .then((response) => {
+        .then((response: any) => {
           console.log('Département mis à jour avec succès', response);
           this.loadDepartements();
           this.closeEditModal();
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('Erreur lors de la mise à jour du département', error);
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors &&
+            error.response.data.errors.nom_departement
+          ) {
+            this.editErrorMessage =
+              error.response.data.errors.nom_departement[0];
+            this.editDepartmentForm
+              .get('nom_departement')
+              ?.setErrors({ unique: true });
+          } else {
+            this.editErrorMessage =
+              'Une erreur est survenue. Veuillez réessayer.';
+          }
         });
     } else {
       console.error(
@@ -165,6 +190,11 @@ export class DepartementsComponent implements OnInit {
     }
   }
 
+  closeModal(): void {
+    this.showModal = false;
+    this.departmentForm.reset();
+    this.errorMessage = null;
+  }
   openDeleteModal(departement: any): void {
     console.log(
       'Ouverture du modal de suppression pour le département',

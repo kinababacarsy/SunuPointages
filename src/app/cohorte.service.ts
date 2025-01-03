@@ -60,21 +60,16 @@ export class CohorteService {
       });
   }
 
-  // Récupérer le nombre d'apprenants dans une cohorte
-  getApprenantCountByCohorte(cohorteId: string): Observable<number> {
-    console.log('Requête API envoyée pour cohorteId:', cohorteId); // Log de l'ID
-    return new Observable((observer) => {
-      axios
-        .get(`${this.apiUrl}/cohortes/${cohorteId}/apprenant-count`)
-        .then((response) => {
-          console.log("Réponse de l'API:", response.data); // Log de la réponse
-          observer.next(response.data.count);
-          observer.complete();
-        })
-        .catch((error) => {
-          console.error('Erreur lors de la requête:', error); // Log des erreurs
-          observer.error(error);
-        });
-    });
+  getTotalCohortes(): Promise<any> {
+    return axios
+      .get(`${this.apiUrl}/cohortes/count`)
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error(
+          'Erreur lors de la récupération du nombre total de cohortes',
+          error
+        );
+        throw error;
+      });
   }
 }

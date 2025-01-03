@@ -59,4 +59,17 @@ export class DepartementService {
         throw error;
       });
   }
+
+  getTotalDepartements(): Promise<any> {
+    return axios
+      .get(`${this.apiUrl}/departements/count`)
+      .then((response) => response.data)
+      .catch((error) => {
+        console.error(
+          'Erreur lors de la récupération du nombre total de départements',
+          error
+        );
+        throw error;
+      });
+  }
 }
