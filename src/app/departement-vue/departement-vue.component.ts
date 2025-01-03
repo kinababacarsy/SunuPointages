@@ -32,7 +32,6 @@ export class DepartementVueComponent implements OnInit {
   departements: any[] = []; // Liste des départements disponibles
   sortField: string = 'nom'; // Champ de tri
   sortOrder: string = 'asc'; // Ordre de tri
-  employeeCount: number = 0; // Nombre d'employés
 
   constructor(
     private route: ActivatedRoute,
@@ -46,34 +45,29 @@ export class DepartementVueComponent implements OnInit {
     if (departementId) {
       await this.loadDepartementAndUsers(departementId); // Charger les données initiales
       this.loadDepartements();
-      this.loadEmployeeCount(departementId); // Charger le nombre d'employés
     } else {
       this.errorMessage = 'ID du département non trouvé.';
       this.isLoading = false;
     }
   }
 
+  // Recharger les informations du département
+  reloadDepartement(departementId: string): void {
+    this.departementService
+      .getDepartement(departementId)
+      .then((departement) => {
+        this.departement = departement;
+      })
+      .catch((error) => {
+        this.errorMessage =
+          'Erreur lors du rechargement du département. Veuillez réessayer.';
+        console.error(error);
+      });
+  }
+
   // Méthode pour naviguer vers les détails de l'employé
   viewEmployeeDetails(userId: string): void {
     this.router.navigate(['/employee-details', userId]);
-  }
-
-  // Charger le nombre d'employés dans le département
-  loadEmployeeCount(departementId: string): void {
-    this.departementService
-      .getEmployeeCountByDepartement(departementId)
-      .subscribe({
-        next: (count) => {
-          this.employeeCount = count; // Mettre à jour le nombre d'employés
-        },
-        error: (error) => {
-          console.error(
-            "Erreur lors du chargement du nombre d'employés:",
-            error
-          );
-          this.errorMessage = "Erreur lors du chargement du nombre d'employés.";
-        },
-      });
   }
 
   // Charger les informations du département et les utilisateurs associés
@@ -182,8 +176,8 @@ export class DepartementVueComponent implements OnInit {
           );
           this.updatePagination();
 
-          // Rafraîchir le nombre d'employés
-          this.loadEmployeeCount(this.departement.id);
+          // Recharger les informations du département
+          this.reloadDepartement(this.departement.id);
 
           this.closeDeleteModal();
         },
@@ -221,8 +215,8 @@ export class DepartementVueComponent implements OnInit {
             // Recharger les données du département et des utilisateurs
             this.loadDepartementAndUsers(this.departement.id);
 
-            // Rafraîchir le nombre d'employés
-            this.loadEmployeeCount(this.departement.id);
+            // Recharger les informations du département
+            this.reloadDepartement(this.departement.id);
 
             this.closeChangeDeptModal();
           },
@@ -263,9 +257,6 @@ export class DepartementVueComponent implements OnInit {
           // Recharger les données du département et des utilisateurs
           this.loadDepartementAndUsers(this.departement.id);
 
-          // Rafraîchir le nombre d'employés
-          this.loadEmployeeCount(this.departement.id);
-
           this.selectedUsers = []; // Réinitialiser la sélection
           this.closeDeleteMultipleModal(); // Fermer le modal
         })
@@ -305,21 +296,20 @@ export class DepartementVueComponent implements OnInit {
         const users = this.parseCSV(csvData); // Parser le CSV en tableau d'utilisateurs
 
         // Appeler le service pour ajouter les utilisateurs
-        this.userService.importUsersFromCSV(file, departement_id).subscribe({
-          next: () => {
-            // Recharger les données du département et des utilisateurs
-            this.loadDepartementAndUsers(departement_id);
-
-            // Rafraîchir le nombre d'employés
-            this.loadEmployeeCount(departement_id);
-          },
-          error: (error) => {
-            // Gérer les erreurs
-            this.errorMessage =
-              "Erreur lors de l'importation des utilisateurs. Veuillez réessayer.";
-            console.error(error);
-          },
-        });
+        this.userService
+          .importUsersFromCSVToDepartement(file, departement_id)
+          .subscribe({
+            next: () => {
+              // Recharger les données du département et des utilisateurs
+              this.loadDepartementAndUsers(departement_id);
+            },
+            error: (error) => {
+              // Gérer les erreurs
+              this.errorMessage =
+                "Erreur lors de l'importation des utilisateurs. Veuillez réessayer.";
+              console.error(error);
+            },
+          });
       };
       reader.readAsText(file); // Lire le fichier comme texte
     }

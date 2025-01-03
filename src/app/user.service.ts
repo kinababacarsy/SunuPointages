@@ -104,8 +104,11 @@ export class UserService {
     });
   }
 
-  // Ajouter plusieurs utilisateurs via un fichier CSV
-  importUsersFromCSV(file: File, departementId: string): Observable<any> {
+  // Ajouter plusieurs utilisateurs dans un département via un fichier CSV
+  importUsersFromCSVToDepartement(
+    file: File,
+    departementId: string
+  ): Observable<any> {
     return new Observable((observer) => {
       const formData = new FormData();
       formData.append('csv_file', file);
@@ -120,6 +123,28 @@ export class UserService {
             },
           }
         )
+        .then((response) => {
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          this.handleError(error).subscribe(observer);
+        });
+    });
+  }
+
+  // Importer des utilisateurs dans une cohorte via un fichier CSV
+  importUsersFromCSVToCohorte(file: File, cohorteId: string): Observable<any> {
+    return new Observable((observer) => {
+      const formData = new FormData();
+      formData.append('csv_file', file);
+
+      axios
+        .post(`${this.apiUrl}/cohortes/${cohorteId}/import-users`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
         .then((response) => {
           observer.next(response.data);
           observer.complete();
@@ -205,21 +230,6 @@ export class UserService {
     });
   }
 
-  // Récupérer le nombre d'employés dans un département
-  getEmployeeCountByDepartement(departementId: string): Observable<number> {
-    return new Observable((observer) => {
-      axios
-        .get(`${this.apiUrl}/departements/${departementId}/employee-count`)
-        .then((response) => {
-          observer.next(response.data.count);
-          observer.complete();
-        })
-        .catch((error) => {
-          this.handleError(error).subscribe(observer);
-        });
-    });
-  }
-
   // Récupérer le nombre d'apprenants dans une cohorte
   getApprenantCountByCohorte(cohorteId: string): Observable<number> {
     return new Observable((observer) => {
@@ -227,28 +237,6 @@ export class UserService {
         .get(`${this.apiUrl}/cohortes/${cohorteId}/apprenant-count`)
         .then((response) => {
           observer.next(response.data.count);
-          observer.complete();
-        })
-        .catch((error) => {
-          this.handleError(error).subscribe(observer);
-        });
-    });
-  }
-
-  // Importer des utilisateurs dans une cohorte via un fichier CSV
-  importUsersFromCSVToCohorte(file: File, cohorteId: string): Observable<any> {
-    return new Observable((observer) => {
-      const formData = new FormData();
-      formData.append('csv_file', file);
-
-      axios
-        .post(`${this.apiUrl}/cohortes/${cohorteId}/import-users`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        .then((response) => {
-          observer.next(response.data);
           observer.complete();
         })
         .catch((error) => {

@@ -32,7 +32,6 @@ export class CohorteVueComponent implements OnInit {
   cohortes: any[] = []; // Liste des cohortes disponibles
   sortField: string = 'nom'; // Champ de tri
   sortOrder: string = 'asc'; // Ordre de tri
-  apprenantCount: number = 0; // Nombre d'apprenants
 
   constructor(
     private route: ActivatedRoute,
@@ -46,7 +45,6 @@ export class CohorteVueComponent implements OnInit {
     if (cohorteId) {
       await this.loadCohorteAndUsers(cohorteId); // Charger les données initiales
       this.loadCohortes();
-      this.loadApprenantCount(cohorteId); // Charger le nombre d'apprenants
     } else {
       this.errorMessage = 'ID de la cohorte non trouvé.';
       this.isLoading = false;
@@ -56,22 +54,6 @@ export class CohorteVueComponent implements OnInit {
   // Méthode pour naviguer vers les détails de l'apprenant
   viewApprenantDetails(userId: string): void {
     this.router.navigate(['/apprenant-details', userId]);
-  }
-
-  // Charger le nombre d'apprenants dans la cohorte
-  loadApprenantCount(cohorteId: string): void {
-    this.cohorteService.getApprenantCountByCohorte(cohorteId).subscribe({
-      next: (count) => {
-        this.apprenantCount = count; // Mettre à jour le nombre d'apprenants
-      },
-      error: (error) => {
-        console.error(
-          "Erreur lors du chargement du nombre d'apprenants:",
-          error
-        );
-        this.errorMessage = "Erreur lors du chargement du nombre d'apprenants.";
-      },
-    });
   }
 
   // Charger les informations de la cohorte et les apprenants associés
@@ -180,9 +162,6 @@ export class CohorteVueComponent implements OnInit {
           );
           this.updatePagination();
 
-          // Rafraîchir le nombre d'apprenants
-          this.loadApprenantCount(this.cohorte.id);
-
           this.closeDeleteModal();
         },
         error: (error) => {
@@ -218,9 +197,6 @@ export class CohorteVueComponent implements OnInit {
           next: () => {
             // Recharger les données de la cohorte et des apprenants
             this.loadCohorteAndUsers(this.cohorte.id);
-
-            // Rafraîchir le nombre d'apprenants
-            this.loadApprenantCount(this.cohorte.id);
 
             this.closeChangeCohorteModal();
           },
@@ -261,9 +237,6 @@ export class CohorteVueComponent implements OnInit {
           // Recharger les données de la cohorte et des apprenants
           this.loadCohorteAndUsers(this.cohorte.id);
 
-          // Rafraîchir le nombre d'apprenants
-          this.loadApprenantCount(this.cohorte.id);
-
           this.selectedUsers = []; // Réinitialiser la sélection
           this.closeDeleteMultipleModal(); // Fermer le modal
         })
@@ -303,21 +276,20 @@ export class CohorteVueComponent implements OnInit {
         const users = this.parseCSV(csvData); // Parser le CSV en tableau d'apprenants
 
         // Appeler le service pour ajouter les apprenants
-        this.userService.importUsersFromCSVToCohorte(file, cohorte_id).subscribe({
-          next: () => {
-            // Recharger les données de la cohorte et des apprenants
-            this.loadCohorteAndUsers(cohorte_id);
-
-            // Rafraîchir le nombre d'apprenants
-            this.loadApprenantCount(cohorte_id);
-          },
-          error: (error) => {
-            // Gérer les erreurs
-            this.errorMessage =
-              "Erreur lors de l'importation des apprenants. Veuillez réessayer.";
-            console.error(error);
-          },
-        });
+        this.userService
+          .importUsersFromCSVToCohorte(file, cohorte_id)
+          .subscribe({
+            next: () => {
+              // Recharger les données de la cohorte et des apprenants
+              this.loadCohorteAndUsers(cohorte_id);
+            },
+            error: (error) => {
+              // Gérer les erreurs
+              this.errorMessage =
+                "Erreur lors de l'importation des apprenants. Veuillez réessayer.";
+              console.error(error);
+            },
+          });
       };
       reader.readAsText(file); // Lire le fichier comme texte
     }
@@ -328,7 +300,7 @@ export class CohorteVueComponent implements OnInit {
     const lines = csvData.split('\n');
     const users = [];
     for (let i = 1; i < lines.length; i++) {
-      const [nom, prenom, email, telephone, adresse, photo, role] =
+      const [nom, prenom, email, telephone, adresse, photo] =
         lines[i].split(',');
       if (nom && prenom && email) {
         users.push({
@@ -338,7 +310,7 @@ export class CohorteVueComponent implements OnInit {
           telephone,
           adresse,
           photo,
-          role: role || 'apprenant', // Utiliser le rôle du CSV s'il existe, sinon "apprenant" par défaut
+          role: 'apprenant', // Utiliser le rôle "apprenant" par défaut
           cohorte_id: this.cohorte.id,
         });
       }
