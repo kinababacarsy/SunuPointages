@@ -16,60 +16,59 @@
   </header>
 <main class="dashboard-content">
   <!-- Cards Section -->
-  <div class="stats-cards">
-    <div class="stat-card">
-      <div class="card-icon">
-        <i class="fas fa-users"></i>
+  <main class="dashboard-content">
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="card-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="card-content">
+          <h3>Total des Employés</h3>
+          <p>{{ stats().totalEmployes }}</p>
+        </div>
       </div>
-      <div class="card-content">
-        <h3>Total des Employés</h3>
-        <p>{{ totalEmployes }}</p>
-      </div>
-    </div>
-    
-    <div class="stat-card blue-card">      <div class="card-icon">
-        <i class="fas fa-graduation-cap"></i>
-      </div>
-      <div class="card-content">
-        <h3>Total des Apprenants</h3>
-        <p>{{ totalApprenants }}</p>
-      </div>
-    </div>
-  </div>
-
- <div class="info-card">
-  <div class="row align-items-center">
-    <!-- Heure et Date -->
-    <div class="col-md-3 date-time">
-      <i class="bi bi-calendar text-warning me-2 fs-4"></i>
-      <div>
-        <p class="text-muted mb-0">{{ date.split(',')[0] }}</p>
-        <h4>{{ date.split(',')[1] }}</h4>
+      
+      <div class="stat-card blue-card">
+        <div class="card-icon">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="card-content">
+          <h3>Total des Apprenants</h3>
+          <p>{{ stats().totalApprenants }}</p>
+        </div>
       </div>
     </div>
 
-    <!-- Statistiques -->
-    <div class="col-md-9 stats-row">
-      <div class="stat-box large">
-        <span class="stat-label">Départements</span>
-        <span class="stat-value">{{ totalDepartements }}</span>
-      </div>
-      <div class="stat-box large">
-                <span class="stat-label">Cohortes</span>
-        <span class="stat-value">{{ totalCohortes }}</span>
-      </div>
-      <div class="stat-box large">
-                <span class="stat-label">Nombre d'Admins</span>
-        <span class="stat-value">{{ totalAdmins }}</span>
-      </div>
-      <div class="stat-box large">
-                <span class="stat-label">Nombre de Vigiles</span>
-        <span class="stat-value">{{ totalVigiles }}</span>
+    <div class="info-card">
+      <div class="row align-items-center">
+        <div class="col-md-3 date-time">
+          <i class="bi bi-calendar text-warning me-2 fs-4"></i>
+          <div>
+            <p class="text-muted mb-0">{{ date.split(',')[0] }}</p>
+            <h4>{{ date.split(',')[1] }}</h4>
+          </div>
+        </div>
+
+        <div class="col-md-9 stats-row">
+          <div class="stat-box large">
+            <span class="stat-label">Départements</span>
+            <span class="stat-value">{{ stats().totalDepartements }}</span>
+          </div>
+          <div class="stat-box large">
+            <span class="stat-label">Cohortes</span>
+            <span class="stat-value">{{ stats().totalCohortes }}</span>
+          </div>
+          <div class="stat-box large">
+            <span class="stat-label">Nombre d'Admins</span>
+            <span class="stat-value">{{ stats().totalAdmins }}</span>
+          </div>
+          <div class="stat-box large">
+            <span class="stat-label">Nombre de Vigiles</span>
+            <span class="stat-value">{{ stats().totalVigiles }}</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-
 
   <!-- Presence Table -->
   <div class="presence-section">
