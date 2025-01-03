@@ -1,172 +1,150 @@
-<div class="container-fluid p-3">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-white rounded-3 shadow-sm mb-4">
-      <div class="container-fluid">
-        <div class="navbar-brand d-flex align-items-center">
-          <img src="assets/logo.png" alt="SDNU" height="40">
-        </div>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link" href="#"><i class="bi bi-house-door"></i></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Départements</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Cohortes</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Pointages</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-danger" href="#">Déconnexion</a>
-            </li>
-          </ul>
-        </div>
-        <div class="ms-auto d-none d-lg-block">
-          <img src="assets/profile.png" alt="Profile" class="rounded-circle" width="40">
-        </div>
-      </div>
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="logo">
+      <img src="assets/logo.png" alt="Logo">
+    </div>
+    <nav class="navigation">
+      <a href="#" class="active">Home</a>
+      <a href="#">Departements</a>
+      <a href="#">Cohortes</a>
+      <a href="#">Pointages</a>
+      <a href="#">Deconnexion</a>
     </nav>
-
-    <!-- Stats Cards -->
-    <div class="row g-4 mb-4">
-      <div class="col-md-6">
-        <div class="card shadow-sm h-100">
-          <div class="card-body text-center">
-            <div class="d-flex justify-content-center mb-3">
-              <i class="bi bi-people text-info" style="font-size: 2rem;"></i>
-            </div>
-            <h6 class="text-info">Total Employés</h6>
-            <h2>60</h2>
-          </div>
-        </div>
+    <div class="profile">
+      <img src="assets/profile.png" alt="Profile">
+    </div>
+  </header>
+<main class="dashboard-content">
+  <!-- Cards Section -->
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="card-icon">
+        <i class="fas fa-users"></i>
       </div>
-      <div class="col-md-6">
-        <div class="card shadow-sm bg-info text-white h-100">
-          <div class="card-body text-center">
-            <div class="d-flex justify-content-center mb-3">
-              <i class="bi bi-mortarboard" style="font-size: 2rem;"></i>
-            </div>
-            <h6>Total Apprenants</h6>
-            <h2>100</h2>
-          </div>
-        </div>
+      <div class="card-content">
+        <h3>Total des Employés</h3>
+        <p>{{ totalEmployes }}</p>
       </div>
     </div>
-
-    <!-- Quick Stats -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-lg-4 d-flex align-items-center">
-            <i class="bi bi-calendar text-warning me-2 fs-4"></i>
-            <div>
-              <div class="small text-muted">10, Décembre 2024</div>
-              <div>17h00</div>
-            </div>
-          </div>
-          <div class="col-lg-8">
-            <div class="row g-3">
-              <div class="col-6 col-md-3">
-                <div class="border rounded p-2 text-center">
-                  <div class="small text-muted">Départements</div>
-                  <div class="fw-bold">5</div>
-                </div>
-              </div>
-              <div class="col-6 col-md-3">
-                <div class="border rounded p-2 text-center">
-                  <div class="small text-muted">Cohortes</div>
-                  <div class="fw-bold">10</div>
-                </div>
-              </div>
-              <div class="col-6 col-md-3">
-                <div class="border rounded p-2 text-center">
-                  <div class="small text-muted">Nombre d'admin</div>
-                  <div class="fw-bold">3</div>
-                </div>
-              </div>
-              <div class="col-6 col-md-3">
-                <div class="border rounded p-2 text-center">
-                  <div class="small text-muted">Nombre de vigiles</div>
-                  <div class="fw-bold">20</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    
+    <div class="stat-card blue-card">      <div class="card-icon">
+        <i class="fas fa-graduation-cap"></i>
       </div>
-    </div>
-
-    <!-- Presence List & Chart -->
-    <div class="row g-4">
-      <div class="col-lg-8">
-        <div class="card shadow-sm">
-          <div class="card-header bg-white d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-            <h6 class="mb-0">Liste de présences</h6>
-            <div class="d-flex gap-2 align-items-center">
-              <div class="small text-muted">Total: 100</div>
-              <input type="text" class="form-control form-control-sm" placeholder="Recherche...">
-            </div>
-          </div>
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>Matricule</th>
-                  <th>Employé</th>
-                  <th>Date</th>
-                  <th>Département</th>
-                  <th>Entrée</th>
-                  <th>Sortie</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (presence of presences; track presence.matricule) {
-                  <tr>
-                    <td>{{presence.matricule}}</td>
-                    <td>{{presence.employe}}</td>
-                    <td>{{presence.date}}</td>
-                    <td>{{presence.departement}}</td>
-                    <td>{{presence.entree}}</td>
-                    <td>{{presence.sortie}}</td>
-                    <td>
-                      <span [class]="'badge rounded-pill ' + presence.statusClass">
-                        {{presence.status}}
-                      </span>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-          <div class="card-footer bg-white">
-            <nav>
-              <ul class="pagination pagination-sm justify-content-end mb-0">
-                <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="card shadow-sm">
-          <div class="card-header bg-white">
-            <h6 class="mb-0">Historiques</h6>
-          </div>
-          <div class="card-body">
-            <canvas #chartCanvas></canvas>
-          </div>
-        </div>
+      <div class="card-content">
+        <h3>Total des Apprenants</h3>
+        <p>{{ totalApprenants }}</p>
       </div>
     </div>
   </div>
+
+ <div class="info-card">
+  <div class="row align-items-center">
+    <!-- Heure et Date -->
+    <div class="col-md-3 date-time">
+      <i class="bi bi-calendar text-warning me-2 fs-4"></i>
+      <div>
+        <p class="text-muted mb-0">{{ date.split(',')[0] }}</p>
+        <h2>{{ date.split(',')[1] }}</h2>
+      </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="col-md-9 stats-row">
+      <div class="stat-box large">
+        <span class="stat-label">Départements</span>
+        <span class="stat-value">{{ totalDepartements }}</span>
+      </div>
+      <div class="stat-box large">
+                <span class="stat-label">Cohortes</span>
+        <span class="stat-value">{{ totalCohortes }}</span>
+      </div>
+      <div class="stat-box large">
+                <span class="stat-label">Nombre d'Admins</span>
+        <span class="stat-value">{{ totalAdmins }}</span>
+      </div>
+      <div class="stat-box large">
+                <span class="stat-label">Nombre de Vigiles</span>
+        <span class="stat-value">{{ totalVigiles }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+        <!-- Presence List & Chart -->
+
+  <!-- Presence Table -->
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+          <h6 class="mb-0">Liste de présences</h6>
+          <div class="d-flex gap-2 align-items-center">
+
+          <div class="presence-filters">
+        <span>Total: {{ presences.length }}</span>
+
+         <!-- Filtres et barre de recherche -->
+      <div class="d-flex justify-content-between mb-3">
+        <select class="form-select">
+          <option value="employe">Employés</option>
+          <option value="apprenant">Apprenants</option>
+        </select>
+        <input type="text" class="form-control" placeholder="Rechercher...">
+      </div>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Matricule</th>
+            <th>Employé/Apprenant</th>
+            <th>Date</th>
+            <th>Département</th>
+            <th>Entrée</th>
+            <th>Sortie</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let presence of presences">
+            <td>{{ presence.matricule }}</td>
+            <td>{{ presence.employe }}</td>
+            <td>{{ presence.date }}</td>
+            <td>{{ presence.departement }}</td>
+            <td>{{ presence.entree }}</td>
+            <td>{{ presence.sortie }}</td>
+            <td>
+              <span [class]="'badge rounded-pill ' + presence.statusClass">
+                {{presence.status}}
+              </span>
+            </td>
+             </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+  <!-- Graphique en cercle -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h6 class="mb-0">Historiques</h6>
+      </div>
+      <div class="card-body">
+        <div echarts [options]="pieChartOptions" class="echart"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+      
+
+      
+        
+        
+  
+</main>

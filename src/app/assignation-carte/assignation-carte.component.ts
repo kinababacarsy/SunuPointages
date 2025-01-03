@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+//import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-assignation-carte',
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule,  FormsModule],
   templateUrl: './assignation-carte.component.html',
   styleUrl: './assignation-carte.component.css'
 })
