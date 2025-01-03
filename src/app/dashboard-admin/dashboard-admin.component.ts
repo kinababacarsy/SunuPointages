@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { NgxEchartsModule } from 'ngx-echarts';
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   standalone: true,
   selector: 'app-dashboard-admin',
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.css'],
-  imports: [NgxEchartsModule, HttpClientModule],
+  imports: [HttpClientModule],
 })
 export class DashboardAdminComponent implements OnInit {
   totalEmployes: number = 0;
@@ -19,52 +19,6 @@ export class DashboardAdminComponent implements OnInit {
   date: string = new Date().toLocaleString();
   presences: any[] = [];
   historiques: any[] = [];
-
-
-
-  // Options pour le graphique
-  pieChartOptions: any = {
-    tooltip: {
-      trigger: 'item',
-    },
-    legend: {
-      top: '5%',
-      left: 'center',
-    },
-    series: [
-      {
-        name: 'Statistiques',
-        type: 'pie',
-        radius: ['40%', '70%'], // Donut chart
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#fff',
-          borderWidth: 2,
-        },
-        label: {
-          show: false,
-          position: 'center',
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: '18',
-            fontWeight: 'bold',
-          },
-        },
-        labelLine: {
-          show: false,
-        },
-        data: [
-          { value: 0, name: 'Présents' },
-          { value: 0, name: 'Congés/voyages' },
-          { value: 0, name: 'Retards' },
-          { value: 0, name: 'Absents' },
-        ],
-      },
-    ],
-  };
 
   constructor(private http: HttpClient) {}
 
@@ -99,25 +53,5 @@ export class DashboardAdminComponent implements OnInit {
     });
 
     // Ajoutez d'autres appels API pour obtenir les présences et historiques
-
-    this.http.get('/api/historiques').subscribe((data: any) => {
-      this.historiques = data;
-      this.updateChartData();
-    });
-  }
-
-  updateChartData() {
-    const present = this.historiques.filter((h) => h.status === 'Présent').length;
-    const conges = this.historiques.filter((h) => h.status === 'Congé').length;
-    const retards = this.historiques.filter((h) => h.status === 'Retard').length;
-    const absents = this.historiques.filter((h) => h.status === 'Absent').length;
-
-    this.pieChartOptions.series[0].data = [
-      { value: present, name: 'Présents' },
-      { value: conges, name: 'Congés' },
-      { value: retards, name: 'Retards' },
-      { value: absents, name: 'Absents' },
-    ];
   }
 }
-  

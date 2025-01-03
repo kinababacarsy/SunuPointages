@@ -44,7 +44,7 @@
       <i class="bi bi-calendar text-warning me-2 fs-4"></i>
       <div>
         <p class="text-muted mb-0">{{ date.split(',')[0] }}</p>
-        <h2>{{ date.split(',')[1] }}</h2>
+        <h4>{{ date.split(',')[1] }}</h4>
       </div>
     </div>
 
@@ -70,18 +70,12 @@
   </div>
 </div>
 
-        <!-- Presence List & Chart -->
 
   <!-- Presence Table -->
-  <div class="row g-4">
-    <div class="col-lg-8">
-      <div class="card shadow-sm">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-
-          <h6 class="mb-0">Liste de présences</h6>
-          <div class="d-flex gap-2 align-items-center">
-
-          <div class="presence-filters">
+  <div class="presence-section">
+    <div class="presence-header">
+      <h2>Liste de Présences</h2>
+      <div class="presence-filters">
         <span>Total: {{ presences.length }}</span>
 
          <!-- Filtres et barre de recherche -->
@@ -96,7 +90,7 @@
     </div>
     
     <div class="table-responsive">
-      <table class="table table-hover mb-0">
+      <table>
         <thead>
           <tr>
             <th>Matricule</th>
@@ -116,35 +110,10 @@
             <td>{{ presence.departement }}</td>
             <td>{{ presence.entree }}</td>
             <td>{{ presence.sortie }}</td>
-            <td>
-              <span [class]="'badge rounded-pill ' + presence.statusClass">
-                {{presence.status}}
-              </span>
-            </td>
-             </tr>
+            <td [class]="presence.status.toLowerCase()">{{ presence.status }}</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
-</div>
-
-  <!-- Graphique en cercle -->
-  <div class="col-lg-4">
-    <div class="card shadow-sm">
-      <div class="card-header bg-white">
-        <h6 class="mb-0">Historiques</h6>
-      </div>
-      <div class="card-body">
-        <div echarts [options]="pieChartOptions" class="echart"></div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-      
-
-      
-        
-        
-  
 </main>
