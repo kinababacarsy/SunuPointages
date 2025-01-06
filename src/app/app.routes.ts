@@ -7,6 +7,7 @@ import { DepartementVueComponent } from './departement-vue/departement-vue.compo
 import { EmployeeDetailsComponent } from './employee-details/employee-details.component';
 import { CohorteVueComponent } from './cohorte-vue/cohorte-vue.component'; // Ajouté
 import { ApprenantDetailsComponent } from './apprenant-details/apprenant-details.component'; // Ajouté
+import { UserFormComponent } from './user-form/user-form.component';
 
 // Configuration des routes
 export const routes: Routes = [
@@ -19,4 +20,6 @@ export const routes: Routes = [
   { path: 'cohorte/:id', component: CohorteVueComponent }, // Ajouté
   { path: 'employee-details/:id', component: EmployeeDetailsComponent },
   { path: 'apprenant-details/:id', component: ApprenantDetailsComponent }, // Ajouté
+  { path: 'departement/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un employé
+  { path: 'cohorte/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un apprenant
 ];

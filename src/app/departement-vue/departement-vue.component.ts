@@ -338,9 +338,13 @@ export class DepartementVueComponent implements OnInit {
     return users;
   }
 
-  // Ouvrir un modal pour ajouter un utilisateur (à implémenter)
-  openAddUserModal(): void {
-    console.log("Ouvrir le modal d'ajout d'utilisateur");
+  // Ajoutez cette méthode dans DepartementVueComponent
+  redirectToAddUser(): void {
+    this.router.navigate([
+      '/departement',
+      this.departement.id,
+      'ajout-utilisateur',
+    ]);
   }
 
   // Éditer un utilisateur

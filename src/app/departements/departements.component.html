@@ -188,15 +188,27 @@
       </h2>
     </header>
     <div class="modal-body">
-      <p *ngIf="showDeleteModal">
+      <!-- Message pour la suppression d'un seul département -->
+      <p *ngIf="showDeleteModal && canDeleteDepartement(departementToDelete)">
         Êtes-vous sûr de vouloir supprimer ce département ?
       </p>
-      <p *ngIf="showDeleteMultipleModal">
+      <p *ngIf="showDeleteModal && !canDeleteDepartement(departementToDelete)">
+        Ce département contient des utilisateurs, il est impossible de le
+        supprimer.
+      </p>
+
+      <!-- Message pour la suppression multiple de départements -->
+      <p *ngIf="showDeleteMultipleModal && canDeleteSelectedDepartements()">
         Êtes-vous sûr de vouloir supprimer les
         {{ selectedDepartements.length }} départements sélectionnés ?
       </p>
+      <p *ngIf="showDeleteMultipleModal && hasUsersInSelectedDepartements()">
+        Un ou plusieurs départements sélectionnés contiennent des utilisateurs,
+        ils ne peuvent pas être supprimés.
+      </p>
     </div>
     <div class="buttons">
+      <!-- Bouton Annuler -->
       <button
         type="button"
         (click)="
@@ -206,7 +218,13 @@
       >
         ANNULER
       </button>
+
+      <!-- Bouton Confirmer (affiché uniquement si la suppression est autorisée) -->
       <button
+        *ngIf="
+          (showDeleteModal && canDeleteDepartement(departementToDelete)) ||
+          (showDeleteMultipleModal && canDeleteSelectedDepartements())
+        "
         type="button"
         (click)="showDeleteModal ? confirmDelete() : confirmDeleteMultiple()"
         class="confirm"

@@ -318,9 +318,9 @@ export class CohorteVueComponent implements OnInit {
     return users;
   }
 
-  // Ouvrir un modal pour ajouter un apprenant (à implémenter)
-  openAddUserModal(): void {
-    console.log("Ouvrir le modal d'ajout d'apprenant");
+  // Ajoutez cette méthode dans DepartementVueComponent
+  redirectToAddUser(): void {
+    this.router.navigate(['/cohorte', this.cohorte.id, 'ajout-utilisateur']);
   }
 
   // Éditer un apprenant
