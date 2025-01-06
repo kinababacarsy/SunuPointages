@@ -1,0 +1,60 @@
+<!-- pointage.component.html -->
+<div class="container">
+    <header class="header">
+        <div class="logo">
+            <img src="sunuPointage.png" alt="Sunu Logo">
+        </div>
+        <h1 class="title">SUNU POINTAGE</h1>
+        <div class="profile-icon">
+            <img src="vigile.png" alt="Profile">
+        </div>
+    </header>
+
+    <div class="pointage-section">
+        <h2 class="pointage-title">Pointage du jour</h2>
+
+
+
+        <!-- Affichage de l'erreur -->
+        <div *ngIf="error" class="error-message">
+            {{ error }}
+        </div>
+
+        <!-- Affichage du tableau -->
+        <!-- Affichage du tableau -->
+        <table class="pointage-table" *ngIf="!error">
+            <thead>
+                <tr>
+                    <th>Matricule</th>
+                    <th>Nom et prénom</th>
+                    <th>Département/Cohorte</th>
+                    <th>Premier pointage</th>
+                    <th>Dernier pointage</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngIf="loading">
+                    <td colspan="6" class="loading">Chargement des données...</td>
+                </tr>
+                <tr *ngIf="!loading && pointages.length === 0">
+                    <td colspan="6" class="loading">Aucune donnée disponible</td>
+                </tr>
+                <tr *ngFor="let pointage of pointages">
+                    <td>{{ pointage.matricule }}</td>
+                    <td>{{ pointage.nom }}</td>
+                    <td>{{ pointage.departement }}</td>
+                    <td>{{ pointage.premierPointage || '---' }}</td>
+                    <td>{{ pointage.dernierPointage || '---' }}</td>
+                    <td>
+                        <span class="status" [ngClass]="getStatusClass(pointage.statut)">
+                    {{ pointage.statut }}
+                </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="retour-btn" (click)="onRetour()">RETOUR</button>
+    </div>
+</div>
