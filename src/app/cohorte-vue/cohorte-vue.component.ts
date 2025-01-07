@@ -5,11 +5,12 @@ import { UserService } from '../user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-cohorte-vue',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './cohorte-vue.component.html',
   styleUrls: ['./cohorte-vue.component.css'],
 })

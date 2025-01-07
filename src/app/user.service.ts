@@ -12,13 +12,12 @@ export interface User {
   telephone: string;
   adresse?: string;
   photo?: string;
-  role: 'employe' | 'apprenant';
+  role: 'employe' | 'apprenant' | 'admin' | 'vigile';
   departement_id?: string;
   cohorte_id?: string;
-  cardID?: string;
-  status?: string;
+  mot_de_passe?: string; // Optionnel (uniquement pour le formulaire)
+  confirmation_mot_de_passe?: string; // Optionnel (uniquement pour le formulaire)
 }
-
 @Injectable({
   providedIn: 'root',
 })
@@ -222,21 +221,6 @@ export class UserService {
         .get(`${this.apiUrl}/users/cohorte/${cohorteId}`)
         .then((response) => {
           observer.next(response.data);
-          observer.complete();
-        })
-        .catch((error) => {
-          this.handleError(error).subscribe(observer);
-        });
-    });
-  }
-
-  // Récupérer le nombre d'apprenants dans une cohorte
-  getApprenantCountByCohorte(cohorteId: string): Observable<number> {
-    return new Observable((observer) => {
-      axios
-        .get(`${this.apiUrl}/cohortes/${cohorteId}/apprenant-count`)
-        .then((response) => {
-          observer.next(response.data.count);
           observer.complete();
         })
         .catch((error) => {

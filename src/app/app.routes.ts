@@ -2,16 +2,18 @@ import { Routes } from '@angular/router';
 import { DepartementsComponent } from './departements/departements.component';
 import { CohortesComponent } from './cohortes/cohortes.component';
 import { DashboardAdminComponent } from './dashboard-admin/dashboard-admin.component';
-import { PointageComponent } from './pointage/pointage.component';
+
 import { DepartementVueComponent } from './departement-vue/departement-vue.component';
 import { EmployeeDetailsComponent } from './employee-details/employee-details.component';
 import { CohorteVueComponent } from './cohorte-vue/cohorte-vue.component'; // Ajouté
 import { ApprenantDetailsComponent } from './apprenant-details/apprenant-details.component'; // Ajouté
 import { UserFormComponent } from './user-form/user-form.component';
+import { ConnexionVigileComponent } from './connexion-vigile/connexion-vigile.component';
+import { DashboardVigileComponent } from './dashboard-vigile/dashboard-vigile.component';
+import { PointageComponent } from './liste-vigile/liste-vigile.component';
 
 // Configuration des routes
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard-admin', component: DashboardAdminComponent },
   { path: 'departements', component: DepartementsComponent },
   { path: 'cohortes', component: CohortesComponent },
@@ -22,4 +24,8 @@ export const routes: Routes = [
   { path: 'apprenant-details/:id', component: ApprenantDetailsComponent }, // Ajouté
   { path: 'departement/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un employé
   { path: 'cohorte/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un apprenant
+  { path: '', redirectTo: 'login', pathMatch: 'full' }, // Redirection par défaut
+  { path: 'login', component: ConnexionVigileComponent }, // Route vers ConnexionVigile
+  { path: 'dashboard-vigile', component: DashboardVigileComponent }, // Route vers DashboardVigile
+  { path: 'liste-vigile', component: PointageComponent }, // Route vers ListeVigile
 ];

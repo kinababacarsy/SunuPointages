@@ -3,11 +3,12 @@ import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-employee-details',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Importer FormsModule pour le two-way binding
+  imports: [CommonModule, FormsModule, NavbarComponent], // Importer FormsModule pour le two-way binding
   templateUrl: './employee-details.component.html',
   styleUrls: ['./employee-details.component.css'],
 })

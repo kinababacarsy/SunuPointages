@@ -9,11 +9,12 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router'; // Ajoutez cette ligne
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-cohortes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NavbarComponent],
   templateUrl: './departements.component.html',
   styleUrls: ['./departements.component.css'],
 })

@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router'; // Ajoutez cette ligne
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   standalone: true,
   selector: 'app-dashboard-admin',
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.css'],
-  imports: [HttpClientModule, CommonModule],
+  imports: [HttpClientModule, CommonModule, NavbarComponent],
 })
 export class DashboardAdminComponent implements OnInit {
   totalEmployes: number = 0;
