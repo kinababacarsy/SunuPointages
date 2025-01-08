@@ -10,72 +10,91 @@
     </div>
   </header>
 
+  <!-- Bouton pour consulter la liste -->
   <div class="list-button">
     <button class="btn-consult" (click)="consulterListe()">
       Consulter la liste
     </button>
   </div>
 
+  <!-- Contenu principal -->
   <div class="main-content">
-    <!-- Profile Card -->
+    <!-- Carte de profil -->
     <div class="profile-card">
       <div class="profile-image">
-        <img src="inconnu.png" alt="Profile Picture" />
+        <img
+          [src]="employeeData.photo || 'inconnu.png'"
+          alt="Profile Picture"
+        />
       </div>
       <div class="profile-info">
-        <div class="info-item">Matricule : en attente...</div>
-        <div class="info-item">Nom : en attente...</div>
-        <div class="info-item">Prenom : en attente...</div>
-        <div class="info-item">Statut : en attente...</div>
+        <div class="info-item">Matricule : {{ employeeData.matricule }}</div>
+        <div class="info-item">Nom : {{ employeeData.nom }}</div>
+        <div class="info-item">Prénom : {{ employeeData.prenom }}</div>
+        <div class="info-item">Statut : {{ employeeData.statut }}</div>
       </div>
     </div>
 
+    <!-- Carte de contrôle d'accès -->
     <div class="control-card">
       <h2>CONTROLE D'ACCES</h2>
       <div class="control-info">
+        <!-- Premier pointage -->
         <div class="control-item">
           <span class="bold">Premier pointage : </span>
-          <span class="status">en attente...</span>
+          <span class="status">{{ employeeData.premierPointage }}</span>
           <span class="status-icons">
-            <i class="fas fa-check success"></i>
-            <i class="fas fa-times error"></i>
+            <i
+              class="fas fa-check success"
+              *ngIf="employeeData.premierPointage !== 'en attente...'"
+            ></i>
+            <i
+              class="fas fa-times error"
+              *ngIf="employeeData.premierPointage === 'en attente...'"
+            ></i>
           </span>
-          <button class="small-btn">
-            <img src="accesAccorde.png" alt="Image 1" class="btn-icon" />
-            <!-- Image du bouton 1 -->
-          </button>
-          <button class="small-btn">
-            <img src="AccesRefuse.jpeg" alt="Image 2" class="btn-icon" />
-            <!-- Image du bouton 2 -->
-          </button>
         </div>
+
+        <!-- Dernier pointage -->
         <div class="control-item">
           <span class="bold">Dernier pointage : </span>
-          <span class="status">en attente...</span>
+          <span class="status">{{ employeeData.dernierPointage }}</span>
           <span class="status-icons">
-            <i class="fas fa-check success"></i>
-            <i class="fas fa-times error"></i>
+            <i
+              class="fas fa-check success"
+              *ngIf="employeeData.dernierPointage !== 'en attente...'"
+            ></i>
+            <i
+              class="fas fa-times error"
+              *ngIf="employeeData.dernierPointage === 'en attente...'"
+            ></i>
           </span>
-          <button class="small-btn">
-            <img src="accesAccorde.png" alt="Image 1" class="btn-icon" />
-            <!-- Image du bouton 1 -->
-          </button>
-          <button class="small-btn">
-            <img src="AccesRefuse.jpeg" alt="Image 2" class="btn-icon" />
-            <!-- Image du bouton 2 -->
-          </button>
+        </div>
+
+        <!-- Affichage des pointages -->
+        <div class="pointages">
+          <h3>Historique des Pointages</h3>
+          <ul>
+            <li *ngFor="let pointage of employeeData.pointages">
+              {{ pointage.date }} - {{ pointage.type }}
+            </li>
+          </ul>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Bottom Buttons accesAccorde.png  AccesRefuse.jpeg-->
+  <!-- Boutons en bas de page -->
   <div class="bottom-buttons">
-    <button class="btn-open">OUVERTURE PORTE</button>
-    <button class="btn-close">FERMETURE PORTE</button>
+    <button class="btn-open" (click)="ouvrirPorte()">OUVERTURE PORTE</button>
+    <button class="btn-close" (click)="fermerPorte()">FERMETURE PORTE</button>
     <div class="logout-container">
       <button class="btn-logout" (click)="deconnexion()">
-        <img src="deconnexion-icone.png" alt="Logout" class="logout-icon" />
+        <img
+          src="deconnexion-icone.png"
+          alt="Déconnexion"
+          class="logout-icon"
+        />
       </button>
     </div>
   </div>

@@ -1,48 +1,41 @@
+<app-navbar></app-navbar>
+
 <div class="container">
+  <!-- En-tête du formulaire -->
   <div class="header">
-    <a (click)="onRetour()">
+    <a (click)="onRetour()" class="back-link">
       <i class="fas fa-arrow-left"></i>
       {{ isCohorteContext ? "Nouvel apprenant" : "Nouvel utilisateur" }} -
       {{ isCohorteContext ? "Cohorte" : "Département" }}
     </a>
   </div>
 
-  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-    <!-- Section photo de profil -->
-    <div class="form-group">
-      <div class="profile-pic">
-        <img
-          [src]="userForm.value.photo || 'assets/default-profile.png'"
-          alt="Photo de profil"
-          height="100"
-          width="100"
+  <!-- Formulaire -->
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+    <!-- Photo de profil -->
+    <div class="form-group profile-pic-group">
+      <img
+        [src]="userForm.value.photo || 'assets/default-profile.png'"
+        alt="Photo de profil"
+        class="profile-pic"
+      />
+      <label for="photo" class="upload-label">
+        <i class="fas fa-plus-circle"></i>
+        <input
+          id="photo"
+          type="file"
+          (change)="onFileChange($event)"
+          accept="image/*"
+          hidden
         />
-        <label for="photo" class="upload-label">
-          <i class="fas fa-plus-circle"></i>
-          <input
-            id="photo"
-            type="file"
-            (change)="onFileChange($event)"
-            accept="image/*"
-            style="display: none"
-          />
-        </label>
-      </div>
+      </label>
     </div>
 
-    <!-- Champs Nom et Prénom -->
-    <div class="form-group">
-      <div class="half-width">
-        <label for="nom">
-          <span class="required">*</span>
-          Nom
-        </label>
-        <input
-          id="nom"
-          formControlName="nom"
-          placeholder="Entrer votre nom"
-          type="text"
-        />
+    <!-- Nom et Prénom -->
+    <div class="form-group double-field">
+      <div class="field">
+        <label for="nom">Nom <span class="required">*</span></label>
+        <input id="nom" formControlName="nom" placeholder="Entrer votre nom" />
         <div
           *ngIf="userForm.get('nom')?.invalid && userForm.get('nom')?.touched"
           class="error-message"
@@ -50,16 +43,12 @@
           Le nom est obligatoire.
         </div>
       </div>
-      <div class="half-width">
-        <label for="prenom">
-          <span class="required">*</span>
-          Prénom
-        </label>
+      <div class="field">
+        <label for="prenom">Prénom <span class="required">*</span></label>
         <input
           id="prenom"
           formControlName="prenom"
           placeholder="Entrer votre prénom"
-          type="text"
         />
         <div
           *ngIf="
@@ -72,13 +61,10 @@
       </div>
     </div>
 
-    <!-- Champs Email et Téléphone -->
-    <div class="form-group">
-      <div class="half-width">
-        <label for="email">
-          <span class="required">*</span>
-          Email
-        </label>
+    <!-- Email et Téléphone -->
+    <div class="form-group double-field">
+      <div class="field">
+        <label for="email">Email <span class="required">*</span></label>
         <input
           id="email"
           formControlName="email"
@@ -94,16 +80,12 @@
           L'email est obligatoire et doit être valide.
         </div>
       </div>
-      <div class="half-width">
-        <label for="telephone">
-          <span class="required">*</span>
-          Téléphone
-        </label>
+      <div class="field">
+        <label for="telephone">Téléphone <span class="required">*</span></label>
         <input
           id="telephone"
           formControlName="telephone"
           placeholder="Entrer votre téléphone"
-          type="text"
         />
         <div
           *ngIf="
@@ -117,12 +99,9 @@
       </div>
     </div>
 
-    <!-- Sélection du rôle (uniquement pour les départements) -->
+    <!-- Rôle (uniquement pour les départements) -->
     <div class="form-group" *ngIf="!isCohorteContext">
-      <label for="role">
-        <span class="required">*</span>
-        Rôle
-      </label>
+      <label for="role">Rôle <span class="required">*</span></label>
       <select id="role" formControlName="role" (change)="onRoleChange()">
         <option value="employe">Employé</option>
         <option value="admin">Admin</option>
@@ -130,13 +109,12 @@
       </select>
     </div>
 
-    <!-- Champs Mot de passe et Confirmation (uniquement pour admin et vigile) -->
-    <div class="form-group" *ngIf="showPasswordFields">
-      <div class="half-width">
-        <label for="mot_de_passe">
-          <span class="required">*</span>
-          Mot de passe
-        </label>
+    <!-- Mot de passe et Confirmation (uniquement pour admin et vigile) -->
+    <div class="form-group double-field" *ngIf="showPasswordFields">
+      <div class="field">
+        <label for="mot_de_passe"
+          >Mot de passe <span class="required">*</span></label
+        >
         <input
           id="mot_de_passe"
           formControlName="mot_de_passe"
@@ -154,11 +132,10 @@
           caractères.
         </div>
       </div>
-      <div class="half-width">
-        <label for="confirmation_mot_de_passe">
-          <span class="required">*</span>
-          Confirmation du mot de passe
-        </label>
+      <div class="field">
+        <label for="confirmation_mot_de_passe"
+          >Confirmation <span class="required">*</span></label
+        >
         <input
           id="confirmation_mot_de_passe"
           formControlName="confirmation_mot_de_passe"
@@ -177,23 +154,28 @@
       </div>
     </div>
 
-    <!-- Champs Adresse -->
+    <!-- Adresse -->
     <div class="form-group">
-      <label for="adresse"> Adresse </label>
+      <label for="adresse">Adresse</label>
       <input
         id="adresse"
         formControlName="adresse"
         placeholder="Entrer votre adresse"
-        type="text"
       />
     </div>
 
-    <!-- Boutons Retour et Enregistrer -->
-    <div class="buttons">
+    <!-- Boutons -->
+    <div class="form-group buttons">
       <button type="button" class="btn-retour" (click)="onRetour()">
-        RETOUR
+        Retour
       </button>
-      <button type="submit" class="btn-enregistrer">Enregistrer</button>
+      <button
+        type="submit"
+        class="btn-enregistrer"
+        [disabled]="userForm.invalid || isLoading"
+      >
+        {{ isLoading ? "Enregistrement..." : "Enregistrer" }}
+      </button>
     </div>
   </form>
 </div>

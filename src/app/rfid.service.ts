@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RfidService {
   private socket: WebSocket;
@@ -13,7 +13,7 @@ export class RfidService {
   }
 
   public listen(): Observable<any> {
-    return new Observable(observer => {
+    return new Observable((observer) => {
       this.socket.onmessage = (event) => {
         observer.next(JSON.parse(event.data));
       };

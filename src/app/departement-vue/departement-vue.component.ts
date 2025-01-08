@@ -347,6 +347,14 @@ export class DepartementVueComponent implements OnInit {
       'ajout-utilisateur',
     ]);
   }
+  // Ajoutez cette méthode dans DepartementVueComponent
+  redirectToAssigneUser(): void {
+    this.router.navigate([
+      '/assignation-carte',
+      this.departement.id,
+      'assignation-utilisateur',
+    ]);
+  }
 
   // Éditer un utilisateur
   editUser(user: any): void {
