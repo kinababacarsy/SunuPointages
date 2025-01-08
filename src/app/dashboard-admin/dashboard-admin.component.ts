@@ -1,128 +1,234 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router'; // Ajoutez cette ligne
+import { DashboardAdminService } from '../dashboard-admin.service';
+import { FormsModule } from '@angular/forms';
+import { Chart } from 'chart.js/auto';
 import { NavbarComponent } from '../navbar/navbar.component';
 
+interface User {
+  matricule: string;
+  prenom: string;
+  nom: string;
+  type: string;
+  createdAt: string; // Ajout de la propriété createdAt
+  departement: string;
+  entree: string;
+  sortie: string;
+  status: string;
+}
+
+interface Historique {
+  status: string;
+  count: number;
+}
+
+interface PresenceData {
+  status: string;
+  count: number;
+}
+
+type PeriodKey = 'day' | 'week' | 'month';
+
 @Component({
-  standalone: true,
   selector: 'app-dashboard-admin',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.css'],
-  imports: [HttpClientModule, CommonModule, NavbarComponent],
+  providers: [DashboardAdminService],
 })
 export class DashboardAdminComponent implements OnInit {
+  date: string = new Date().toLocaleString();
+  presences: User[] = [];
+  filteredPresences: User[] = [];
+  private chart: any;
+  selectedPeriod = 'day';
+  selectedCreatedDate: string = '';
+
+  historiques: PresenceData[] = [
+    { status: 'present', count: 50 },
+    { status: 'absent', count: 15 },
+    { status: 'retard', count: 15 },
+    { status: 'congés/voyages', count: 15 },
+  ];
+
+  totalDepartements: any[] = [];
+  totalCohortes: any[] = [];
   totalEmployes: number = 0;
   totalApprenants: number = 0;
-  totalDepartements: number = 0;
-  totalCohortes: number = 0;
   totalAdmins: number = 0;
   totalVigiles: number = 0;
-  date: string = new Date().toLocaleString();
-  presences: any[] = [];
-  historiques: any[] = [];
 
-  // Options pour le graphique
-  pieChartOptions: any = {
-    tooltip: {
-      trigger: 'item',
-    },
-    legend: {
-      top: '5%',
-      left: 'center',
-    },
-    series: [
-      {
-        name: 'Statistiques',
-        type: 'pie',
-        radius: ['40%', '70%'], // Donut chart
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#fff',
-          borderWidth: 2,
-        },
-        label: {
-          show: false,
-          position: 'center',
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: '18',
-            fontWeight: 'bold',
-          },
-        },
-        labelLine: {
-          show: false,
-        },
-        data: [
-          { value: 0, name: 'Présents' },
-          { value: 0, name: 'Congés/voyages' },
-          { value: 0, name: 'Retards' },
-          { value: 0, name: 'Absents' },
-        ],
-      },
-    ],
-  };
+  // Variables de pagination
+  currentPage: number = 1;
+  itemsPerPage: number = 2;
 
-  constructor(private http: HttpClient) {}
+  constructor(public dashboardAdminService: DashboardAdminService) {}
 
   ngOnInit(): void {
-    this.fetchData();
+    this.fetchCounts();
+    this.fetchUserPresences();
+    this.initChart();
   }
 
-  fetchData() {
-    // Remplacez par vos propres API
-    this.http.get('/api/users?role=employe').subscribe((data: any) => {
-      this.totalEmployes = data.length;
-    });
+  fetchCounts(): void {
+    this.dashboardAdminService
+      .getCountDepartements()
+      .subscribe((data) => (this.totalDepartements = data.total_departements));
+    this.dashboardAdminService
+      .getCountCohortes()
+      .subscribe((data) => (this.totalCohortes = data.total_cohortes));
 
-    this.http.get('/api/users?role=apprenant').subscribe((data: any) => {
-      this.totalApprenants = data.length;
-    });
-
-    this.http.get('/api/departements').subscribe((data: any) => {
-      this.totalDepartements = data.length;
-    });
-
-    this.http.get('/api/cohortes').subscribe((data: any) => {
-      this.totalCohortes = data.length;
-    });
-
-    this.http.get('/api/users?role=admin').subscribe((data: any) => {
-      this.totalAdmins = data.length;
-    });
-
-    this.http.get('/api/users?role=vigile').subscribe((data: any) => {
-      this.totalVigiles = data.length;
-    });
-
-    // Ajoutez d'autres appels API pour obtenir les présences et historiques
-
-    this.http.get('/api/historiques').subscribe((data: any) => {
-      this.historiques = data;
-      this.updateChartData();
+    this.dashboardAdminService.getCountAllUsers().subscribe((data) => {
+      this.totalEmployes = data.employes;
+      this.totalApprenants = data.apprenants;
+      this.totalAdmins = data.admins;
+      this.totalVigiles = data.vigiles;
     });
   }
 
-  updateChartData() {
-    const present = this.historiques.filter(
-      (h) => h.status === 'Présent'
-    ).length;
-    const conges = this.historiques.filter((h) => h.status === 'Congé').length;
-    const retards = this.historiques.filter(
-      (h) => h.status === 'Retard'
-    ).length;
-    const absents = this.historiques.filter(
-      (h) => h.status === 'Absent'
-    ).length;
+  fetchUserPresences(): void {
+    this.dashboardAdminService.getUserPresences().subscribe(
+      (data: User[]) => {
+        this.presences = data.map((user) => ({
+          ...user,
+          entree: '--', // Valeur par défaut pour l'entrée
+          sortie: '--', // Valeur par défaut pour la sortie
+          status: 'absent', // Valeur par défaut pour le statut
+          createdAt: new Date().toISOString().split('T')[0], // Date de création par défaut
+        }));
+        this.filteredPresences = this.presences;
+      },
+      (error) => {
+        console.error('Error fetching user presences:', error);
+      }
+    );
+  }
 
-    this.pieChartOptions.series[0].data = [
-      { value: present, name: 'Présents' },
-      { value: conges, name: 'Congés' },
-      { value: retards, name: 'Retards' },
-      { value: absents, name: 'Absents' },
-    ];
+  // Méthode pour obtenir les éléments de la page actuelle
+  getPaginatedPresences(): User[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredPresences.slice(startIndex, endIndex);
+  }
+
+  // Méthode pour changer de page
+  changePage(page: number): void {
+    this.currentPage = page;
+  }
+
+  // Méthode pour obtenir le nombre total de pages
+  getTotalPages(): number {
+    return Math.ceil(this.filteredPresences.length / this.itemsPerPage);
+  }
+
+  private initChart(): void {
+    const ctx = document.getElementById('presenceChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    this.chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: this.historiques.map((item) => item.status),
+        datasets: [
+          {
+            data: this.historiques.map((item) => item.count),
+            backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const value = context.raw;
+                const total = this.historiques.reduce(
+                  (acc, curr) => acc + curr.count,
+                  0
+                );
+                const percentage = (((value as number) / total) * 100).toFixed(
+                  1
+                );
+                return `${context.label}: ${value} (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  calculateTotal(): number {
+    return this.historiques.reduce((acc, curr) => acc + curr.count, 0);
+  }
+
+  updateChartPeriod(event: Event): void {
+    const periodData: Record<PeriodKey, PresenceData[]> = {
+      day: [
+        { status: 'present', count: 150 },
+        { status: 'absent', count: 20 },
+        { status: 'retard', count: 30 },
+      ],
+      week: [
+        { status: 'present', count: 750 },
+        { status: 'absent', count: 100 },
+        { status: 'retard', count: 150 },
+      ],
+      month: [
+        { status: 'present', count: 3000 },
+        { status: 'absent', count: 400 },
+        { status: 'retard', count: 600 },
+      ],
+    };
+
+    const selectElement = event.target as HTMLSelectElement;
+    const period = selectElement.value as PeriodKey;
+
+    this.historiques = periodData[period];
+
+    if (this.chart) {
+      this.chart.data.datasets[0].data = this.historiques.map(
+        (item) => item.count
+      );
+      this.chart.update();
+    }
+  }
+
+  filterByType(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const type = selectElement.value;
+    this.filteredPresences = this.presences.filter((presence) => {
+      return type === 'all' || presence.type === type;
+    });
+    this.currentPage = 1; // Reset to the first page
+  }
+
+  filterByCreatedDate(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.selectedCreatedDate = inputElement.value;
+    this.filteredPresences = this.presences.filter((presence) => {
+      return (
+        !this.selectedCreatedDate ||
+        presence.createdAt === this.selectedCreatedDate
+      );
+    });
+    this.currentPage = 1; // Reset to the first page
+  }
+
+  filterByName(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const query = inputElement.value.toLowerCase();
+    this.filteredPresences = this.presences.filter((presence) => {
+      return (
+        presence.prenom.toLowerCase().includes(query) ||
+        presence.nom.toLowerCase().includes(query)
+      );
+    });
+    this.currentPage = 1; // Reset to the first page
   }
 }
