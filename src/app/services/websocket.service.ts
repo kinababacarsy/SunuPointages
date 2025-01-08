@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class WebSocketService {
   private socket: any;
   private socketUrl: string = 'http://localhost:3000'; // URL du serveur WebSocket
-  private apiUrl: string = 'http://localhost:8000/api/controle-acces'; // URL de votre serveur Node.js pour l'API
+  private apiUrl: string = 'http://localhost:3000/api/controle-acces'; // URL de votre serveur Node.js pour l'API
   public message$ = new Subject<any>(); // Pour diffuser les messages reçus
 
   constructor(private http: HttpClient) {

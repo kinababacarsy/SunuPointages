@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { DepartementsComponent } from './departements/departements.component';
 import { CohortesComponent } from './cohortes/cohortes.component';
-import { AssignationCarteComponent } from './assignation-carte/assignation-carte.component';
+
 import { DashboardAdminComponent } from './dashboard-admin/dashboard-admin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { DepartementVueComponent } from './departement-vue/departement-vue.component';
@@ -29,6 +29,5 @@ export const routes: Routes = [
   { path: 'login', component: ConnexionVigileComponent }, // Route vers ConnexionVigile
   { path: 'dashboard-vigile', component: DashboardVigileComponent }, // Route vers DashboardVigile
   { path: 'liste-vigile', component: PointageComponent }, // Route vers ListeVigile
-  { path: 'assignation-carte', component: AssignationCarteComponent },
   { path: 'dashboard-admin', component: DashboardAdminComponent },
 ];

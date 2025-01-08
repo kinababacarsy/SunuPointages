@@ -75,9 +75,11 @@
         <div class="pointages">
           <h3>Historique des Pointages</h3>
           <ul>
-            <li *ngFor="let pointage of employeeData.pointages">
-              {{ pointage.date }} - {{ pointage.type }}
-            </li>
+            <ul>
+              <li *ngFor="let pointage of employeeData.pointages">
+                {{ formatDate(pointage.date) }} - {{ pointage.type }}
+              </li>
+            </ul>
           </ul>
         </div>
       </div>

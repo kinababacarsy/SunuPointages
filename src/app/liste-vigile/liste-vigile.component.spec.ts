@@ -8,9 +8,8 @@ describe('ListeVigileComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ListeVigileComponent]
-    })
-    .compileComponents();
+      imports: [ListeVigileComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ListeVigileComponent);
     component = fixture.componentInstance;

@@ -1,21 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { PointageService, Pointage } from '../services/pointage.service';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';  // Import du module Router
+import { Router } from '@angular/router'; // Import du module Router
 
 @Component({
   selector: 'app-pointage',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './liste-vigile.component.html',
-  styleUrls: ['./liste-vigile.component.css']
+  styleUrls: ['./liste-vigile.component.css'],
 })
 export class PointageComponent implements OnInit {
   pointages: Pointage[] = [];
   loading: boolean = false;
   error: string = '';
 
-  constructor(private pointageService: PointageService, private router: Router) {}  // Injection du Router
+  constructor(
+    private pointageService: PointageService,
+    private router: Router
+  ) {} // Injection du Router
 
   ngOnInit(): void {
     this.loadPointages();
@@ -32,13 +35,13 @@ export class PointageComponent implements OnInit {
         this.error = 'Erreur lors du chargement des données';
         this.loading = false;
         console.error('Erreur:', err);
-      }
+      },
     });
   }
 
   getStatusClass(statut: string): string {
-    switch(statut.toLowerCase()) {
-      case 'à l\'heure':
+    switch (statut.toLowerCase()) {
+      case "à l'heure":
         return 'status-ontime';
       case 'retard':
         return 'status-late';
@@ -50,6 +53,6 @@ export class PointageComponent implements OnInit {
   }
 
   onRetour(): void {
-    this.router.navigate(['/dashboard-vigile']);  // Redirection vers le dashboard-vigile
+    this.router.navigate(['/dashboard-vigile']); // Redirection vers le dashboard-vigile
   }
 }

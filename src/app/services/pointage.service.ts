@@ -13,7 +13,7 @@ export interface Pointage {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PointageService {
   private apiUrl = 'http://votre-api-url/pointages'; // Remplacez par votre URL d'API

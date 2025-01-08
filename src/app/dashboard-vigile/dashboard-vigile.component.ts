@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { WebSocketService } from '../services/websocket.service'; // Import du service WebSocket
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale'; // Pour le format français
 
 @Component({
   selector: 'app-pointage',
@@ -64,8 +66,7 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
 
   private handleCheckIn(data: any) {
     console.log('Données Check-In reçues:', data);
-    const timestamp = new Date(data.date);
-    const formattedDate = this.formatDate(timestamp);
+    const formattedDate = this.formatDate(data.date); // Formater la date
     this.employeeData.pointages.push({ date: formattedDate, type: 'Check-In' });
     this.employeeData.premierPointage = formattedDate;
     this.cdr.detectChanges();
@@ -74,7 +75,7 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       (response) => {
         console.log('Réponse API Check-In:', response);
         this.errorMessages = [];
-        this.employeeData.premierPointage = response.heure;
+        this.employeeData.premierPointage = this.formatDate(response.heure); // Formater l'heure
         this.employeeData.statut = response.statut;
       },
       (error) => this.handleApiError(error)
@@ -83,15 +84,15 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
 
   private handleCheckOut(data: any) {
     console.log('Données Check-Out reçues:', data);
-    const timestamp = new Date(data.date);
-    this.employeeData.dernierPointage = this.formatDate(timestamp);
+    const formattedDate = this.formatDate(data.date); // Formater la date
+    this.employeeData.dernierPointage = formattedDate;
     this.cdr.detectChanges();
 
     this.createControleAcces(data).subscribe(
       (response) => {
         console.log('Réponse API Check-Out:', response);
         this.errorMessages = [];
-        this.employeeData.dernierPointage = response.heure;
+        this.employeeData.dernierPointage = this.formatDate(response.heure); // Formater l'heure
         this.employeeData.statut = response.statut;
       },
       (error) => this.handleApiError(error)
@@ -106,7 +107,7 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     }
 
     // Faire la requête HTTP avec le cardId dans l'URL
-    const url = `http://localhost:8000/api/controle-acces/pointages/${cardId}`;
+    const url = `http://localhost:3000/api/controle-acces/pointages/${cardId}`;
 
     this.http.get<any>(url).subscribe(
       (response: any) => {
@@ -161,6 +162,11 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     );
+  }
+
+  public formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return format(date, 'dd/MM/yyyy HH:mm', { locale: fr }); // Format français
   }
 
   private formatDateTime(date: string, heure: string): string {
@@ -236,17 +242,6 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     };
   }
 
-  private formatDate(date: Date): string {
-    const options: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    return date.toLocaleString('fr-FR', options);
-  }
-
   private createControleAcces(data: any) {
     const requestData = {
       ...data,
@@ -254,7 +249,7 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     };
 
     return this.http.post<any>(
-      'http://localhost:8000/api/controle-acces',
+      'http://localhost:3000/api/controle-acces',
       requestData
     );
   }
