@@ -1,6 +1,7 @@
 // rfid.service.ts
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import axios from 'axios';
 
 @Injectable({
   providedIn: 'root'
@@ -25,4 +26,19 @@ export class RfidService {
       };
     });
   }
+
+
+  public assignCard(cardData: any): Observable<any> {
+    return new Observable(observer => {
+      axios.put(`http://localhost:8000/api/maj/users/${cardData.matricule}`, { cardUID: cardData.cardNumber })
+        .then(response => {
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch(error => {
+          observer.error(error);
+        });
+    });
+  }
+  
 }

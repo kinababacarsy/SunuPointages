@@ -32,9 +32,15 @@ export class DashboardAdminService {
     return this.http.get<any>(`${this.apiUrl}/users/count`);
   }
 
-  getUserPresences(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/users/presences`);
+  getUserPresences(date?: string): Observable<any> {
+    let url = `${this.apiUrl}/users/presences`;
+    if (date) {
+      url += `?date=${date}`;
+    }
+    return this.http.get<any>(url);
   }
+
+  
 
   getUserHistorique(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/users/historique`);

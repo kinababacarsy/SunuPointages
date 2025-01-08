@@ -1,14 +1,34 @@
 import { Routes } from '@angular/router';
-import { AssignationCarteComponent } from './assignation-carte/assignation-carte.component';
+import { DepartementsComponent } from './departements/departements.component';
+import { CohortesComponent } from './cohortes/cohortes.component';
 import { DashboardAdminComponent } from './dashboard-admin/dashboard-admin.component';
-import { HttpClientModule } from '@angular/common/http';
+import { AssignationCarteComponent } from './assignation-carte/assignation-carte.component';
 
+import { DepartementVueComponent } from './departement-vue/departement-vue.component';
+import { EmployeeDetailsComponent } from './employee-details/employee-details.component';
+import { CohorteVueComponent } from './cohorte-vue/cohorte-vue.component'; // Ajouté
+import { ApprenantDetailsComponent } from './apprenant-details/apprenant-details.component'; // Ajouté
+import { UserFormComponent } from './user-form/user-form.component';
+import { ConnexionVigileComponent } from './connexion-vigile/connexion-vigile.component';
+import { DashboardVigileComponent } from './dashboard-vigile/dashboard-vigile.component';
+import { PointageComponent } from './liste-vigile/liste-vigile.component';
 
+// Configuration des routes
 export const routes: Routes = [
-  {
-    path: 'assignation-carte',component: AssignationCarteComponent},
- 
-    {path: 'dashboard-admin', component: DashboardAdminComponent
-  },
-  // autres routes...
+  { path: 'dashboard-admin', component: DashboardAdminComponent },
+  { path: 'departements', component: DepartementsComponent },
+  { path: 'cohortes', component: CohortesComponent },
+  { path: 'pointage', component: PointageComponent },
+  { path: 'departement/:id', component: DepartementVueComponent },
+  { path: 'cohorte/:id', component: CohorteVueComponent }, // Ajouté
+  { path: 'employee-details/:id', component: EmployeeDetailsComponent },
+  { path: 'apprenant-details/:id', component: ApprenantDetailsComponent }, // Ajouté
+  { path: 'departement/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un employé
+  { path: 'cohorte/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un apprenant
+  { path: '', redirectTo: 'login', pathMatch: 'full' }, // Redirection par défaut
+  { path: 'login', component: ConnexionVigileComponent }, // Route vers ConnexionVigile
+  { path: 'dashboard-vigile', component: DashboardVigileComponent }, // Route vers DashboardVigile
+  { path: 'liste-vigile', component: PointageComponent }, // Route vers ListeVigile
+  { path: 'assignation-carte', component: AssignationCarteComponent }, // Route vers L'assignation des cartes
+
 ];

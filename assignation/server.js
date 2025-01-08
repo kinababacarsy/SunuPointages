@@ -36,6 +36,15 @@ wss.on('connection', (ws) => {
     }
   });
 
+
+  ws.on('message', (message) => {
+    const data = JSON.parse(message);
+    if (data.type === 'assignCard') {
+      handleAssignCard(ws, data.data);
+    }
+  });
+
+  
   ws.on('close', () => {
     console.log('Client déconnecté');
   });

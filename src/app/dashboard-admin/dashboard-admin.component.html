@@ -1,19 +1,5 @@
 <div class="dashboard-container">
-  <header class="dashboard-header">
-    <div class="logo">
-      <img src="assets/logo.png" alt="Logo">
-    </div>
-    <nav class="navigation">
-      <a href="#" class="active">Home</a>
-      <a href="#">Departements</a>
-      <a href="#">Cohortes</a>
-      <a href="#">Pointages</a>
-      <a href="#">Deconnexion</a>
-    </nav>
-    <div class="profile">
-      <img src="assets/profile.png" alt="Profile">
-    </div>
-  </header>
+ <app-navbar></app-navbar>
 
   <main class="dashboard-content">
     <!-- Cards Section -->
@@ -99,7 +85,7 @@
             <option value="apprenant">Apprenants</option>
           </select>
           <input type="date" class="form-control me-2" (change)="filterByCreatedDate($event)">
-          <input type="text" class="form-control" placeholder="Rechercher..." (input)="filterByName($event)">
+          <input type="text" class="form-control" placeholder="Rechercher nom..." (input)="filterByName($event)">
         </div>
       </div>
     </div>
@@ -127,7 +113,7 @@
     </div>
     <div class="pagination-controls">
       <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Précédent</button>
-      <span>Page {{ currentPage }} of {{ getTotalPages() }}</span>
+      <span>page {{ currentPage }} </span>
       <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === getTotalPages()">Suivant</button>
     </div>
   </div>
@@ -139,7 +125,7 @@
       <div class="card h-5">
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Historiques</h5>
+            <h5 class="mb-0">Historique des Pointages</h5>
             <select class="form-select" style="width: auto;" (change)="updateChartPeriod($event)">
               <option value="day">Jour</option>
               <option value="week">Semaine</option>

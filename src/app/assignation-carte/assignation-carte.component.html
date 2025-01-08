@@ -19,7 +19,7 @@
         </div>
         <div class="form-group">
           <label>Date d'assignation</label>
-          <input type="text" [value]="cardData.assignmentDate" readonly class="form-control">
+          <input type="date" [value]="cardData.assignmentDate" readonly class="form-control">
         </div>
       </div>
       <div class="card-status">
@@ -30,7 +30,7 @@
       </div>
       <div class="button-group">
         <button class="btn btn-cancel" (click)="cancelAssignment()">Annuler</button>
-        <button class="btn btn-confirm" (click)="confirmAssignment()">Confirmer l'assignation</button>
+        <button class="btn btn-confirm" (click)="confirmAssignment()">Assigner</button>
       </div>
     </div>
   </main>

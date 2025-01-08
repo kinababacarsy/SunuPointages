@@ -1,26 +1,37 @@
-<header class="header">
-    <div class="logo-section">
-      <img src="assets/logo.png" alt="logo" class="logo-img">
-    </div>
-    
-    <!-- Hamburger menu pour mobile -->
-    <button class="mobile-menu-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+<div class="navbar">
+  <!-- Logo à gauche -->
+  <img
+    class="logo"
+    src="https://storage.googleapis.com/a1aa/image/3399sJrfL4XeOkYdUejvlHSW1pm1Ny2belLB2GNALff3kBofJA.jpg"
+    alt="Logo"
+  />
 
-    <nav class="nav-menu" [class.active]="isMenuOpen">
-      <a routerLink="/departement" routerLinkActive="active">Département</a>
-      <a routerLink="/cohorte" routerLinkActive="active">Cohorte</a>
-      <a routerLink="/pointage" routerLinkActive="active">Pointage</a>
-      <a routerLink="/deconnexion" routerLinkActive="active">
-        Déconnexion 
-        <span class="badge">2</span>
-      </a>
-    </nav>
+  <!-- Liens de navigation (centrés) -->
+  <div class="nav-links">
+    <a class="nav-item" routerLink="/dashboard-admin">
+      <i class="bi bi-house-door"></i> Acceuil
+    </a>
+    <a class="nav-item" routerLink="/departements">
+      <i class="bi bi-building"></i> Départements
+    </a>
+    <a class="nav-item" routerLink="/cohortes">
+      <i class="bi bi-people"></i> Cohortes
+    </a>
+    <a class="nav-item" routerLink="/cartes">
+      <i class="bi bi-card-list"></i> Gestion des Pointages
+    </a>
+  </div>
 
-    <div class="profile">
-      <img src="assets/profile.png" alt="Profile" class="profile-img">
-    </div>
-  </header>
+  <!-- Déconnexion à droite -->
+  <a class="nav-item logout" routerLink="/logout">
+    DECONNEXION
+    <i class="bi bi-box-arrow-right"></i>
+  </a>
+
+  <!-- Image utilisateur à droite -->
+  <img
+    class="user-profile"
+    src="https://storage.googleapis.com/a1aa/image/x1VNAoCopYa7LBs2CxMCAlk02eODEi5erlleuPi9Qh4oMA9nA.jpg"
+    alt="User Profile"
+  />
+</div>

@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RfidService } from '../rfid.service';
-import { Route, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-assignation-carte',
@@ -16,16 +16,22 @@ import { Route, RouterModule } from '@angular/router';
 })
 export class AssignationCarteComponent implements OnInit {
   cardData = {
-    fullName: 'Satorou Gojo',
-    matricule: 'APP001',
+    fullName: '',
+    matricule: '',
     cardNumber: '',
-    assignmentDate: '12/10/2024'
+    assignmentDate: ''
   };
-  router: any;
 
-  constructor(private rfidService: RfidService) {}
+  constructor(private rfidService: RfidService, private router: Router) {}
 
   ngOnInit() {
+    const user = history.state.user;
+    if (user) {
+      this.cardData.fullName = user.fullName;
+      this.cardData.matricule = user.matricule;
+      this.cardData.assignmentDate = new Date().toISOString().split('T')[0];
+    }
+
     this.rfidService.listen().subscribe((data) => {
       if (data.cardId) {
         this.cardData.cardNumber = data.cardId;
@@ -34,17 +40,28 @@ export class AssignationCarteComponent implements OnInit {
   }
 
   scanRFID() {
-    // Logique pour scanner la carte RFID
-    console.log('Scanning RFID...');
+    this.rfidService.listen().subscribe(data => {
+      this.cardData.cardNumber = data.cardNumber;
+    });
   }
 
   cancelAssignment() {
-    // Logique pour annuler
     this.router.navigate(['/dashboard-admin']);
   }
 
   confirmAssignment() {
-    // Logique pour confirmer
+    // Logique pour confirmer l'assignation
     console.log('Assignment confirmed');
+    // Envoyer la requête de mise à jour de l'utilisateur avec la carte UID
+    this.rfidService.assignCard(this.cardData).subscribe(
+      response => {
+        console.log('Carte assignée avec succès:', response);
+        this.router.navigate(['/dashboard-admin']);
+      },
+      error => {
+        console.error('Erreur lors de l\'assignation de la carte:', error);
+      }
+    );
   }
+
 }
