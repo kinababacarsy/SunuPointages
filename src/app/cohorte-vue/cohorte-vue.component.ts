@@ -332,9 +332,7 @@ export class CohorteVueComponent implements OnInit {
   }
 
   // Assigner une carte à un apprenant
-  assignCard(user: any): void {
-    this.router.navigate(['./assignation-carte'], { state: { user}});
-    console.log('Assigner une carte à', user);
-    // Logique pour assigner une carte
+  assignCard(userId: string) {
+    this.router.navigate(['/assignation-carte', userId]);
   }
 }

@@ -29,6 +29,6 @@ export const routes: Routes = [
   { path: 'login', component: ConnexionVigileComponent }, // Route vers ConnexionVigile
   { path: 'dashboard-vigile', component: DashboardVigileComponent }, // Route vers DashboardVigile
   { path: 'liste-vigile', component: PointageComponent }, // Route vers ListeVigile
-  { path: 'assignation-carte', component: AssignationCarteComponent }, // Route vers L'assignation des cartes
+  { path: 'assignation-carte/:id', component: AssignationCarteComponent },
 
 ];

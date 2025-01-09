@@ -1,4 +1,4 @@
-<!-- card-assignment.component.html -->
+<!-- assignation-carte.component.html -->
 <div class="app-container">
   <main class="main-content">
     <div class="card">
@@ -14,7 +14,7 @@
         </div>
         <div class="form-group">
           <label>Numero de carte</label>
-          <input type="text" [(ngModel)]="cardData.cardNumber" placeholder="Scanner pour recuperer" class="form-control">
+          <input type="text" [(ngModel)]="cardData.cardID" placeholder="Scanner pour recuperérer" class="form-control" [readonly]="!isScanning">
           <button class="btn btn-scanner" (click)="scanRFID()">Scanner RFID</button>
         </div>
         <div class="form-group">
@@ -29,9 +29,32 @@
         </div>
       </div>
       <div class="button-group">
-        <button class="btn btn-cancel" (click)="cancelAssignment()">Annuler</button>
-        <button class="btn btn-confirm" (click)="confirmAssignment()">Assigner</button>
+        <button class="btn btn-cancel" (click)="cancelAssignment()" style="margin-right: 20px;">Annuler</button>
+        <button class="btn btn-confirm" (click)="openConfirmationModal()" >Assigner</button>
       </div>
     </div>
   </main>
+</div>
+
+<!-- Modal de confirmation -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <h2>Confirmation</h2>
+    <p>Êtes-vous sûr de vouloir assigner cet utilisateur ?</p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" (click)="closeConfirmationModal()" style="margin-right: 40%;" >Non</button>
+      <button class="btn btn-confirm" (click)="confirmAssignment()" >Oui</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de succès -->
+<div id="successModal" class="modal">
+  <div class="modal-content">
+    <h2>Succès</h2>
+    <p>La carte a été assignée avec succès !</p>
+    <div class="modal-actions">
+      <button class="btn btn-confirm" (click)="closeSuccessModal()">OK</button>
+    </div>
+  </div>
 </div>

@@ -20,6 +20,8 @@ export interface User {
   status?: string;
   mot_de_passe?: string; // Optionnel (uniquement pour le formulaire)
   confirmation_mot_de_passe?: string; // Optionnel (uniquement pour le formulaire)
+  assignmentDate?: string; // Ajout de la propriété assignmentDate
+
 }
 @Injectable({
   providedIn: 'root',
@@ -60,6 +62,22 @@ export class UserService {
     return new Observable((observer) => {
       axios
         .post(`${this.apiUrl}/ajout/users`, userData)
+        .then((response) => {
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          this.handleError(error).subscribe(observer);
+        });
+    });
+  }
+
+
+   // Ajouter un cardID à un utilisateur
+   addCardId(id: string, cardID: string): Observable<User> {
+    return new Observable((observer) => {
+      axios
+        .put(`${this.apiUrl}/users/${id}/add-card`, { cardID })
         .then((response) => {
           observer.next(response.data);
           observer.complete();
@@ -162,6 +180,21 @@ export class UserService {
     return new Observable((observer) => {
       axios
         .get(`${this.apiUrl}/voir/users/${id}`)
+        .then((response) => {
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          this.handleError(error).subscribe(observer);
+        });
+    });
+  }
+
+   // Récupérer un utilisateur par ID
+   getUserById(id: string): Observable<User> {
+    return new Observable((observer) => {
+      axios
+        .get(`${this.apiUrl}/users/${id}`)
         .then((response) => {
           observer.next(response.data);
           observer.complete();
