@@ -15,7 +15,7 @@ export interface User {
   role: 'employe' | 'apprenant' | 'admin' | 'vigile';
   departement_id?: string;
   cohorte_id?: string;
-  mot_de_passe?: string; // Optionnel (uniquement pour le formulaire)
+  mot_de_passe?: string | null; // Autoriser null
   confirmation_mot_de_passe?: string; // Optionnel (uniquement pour le formulaire)
 }
 @Injectable({

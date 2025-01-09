@@ -12,6 +12,7 @@ import { UserFormComponent } from './user-form/user-form.component';
 import { ConnexionVigileComponent } from './connexion-vigile/connexion-vigile.component';
 import { DashboardVigileComponent } from './dashboard-vigile/dashboard-vigile.component';
 import { PointageComponent } from './liste-vigile/liste-vigile.component';
+import { ApprenantFormComponent } from './apprenant-form/apprenant-form.component';
 
 // Configuration des routes
 export const routes: Routes = [
@@ -23,8 +24,16 @@ export const routes: Routes = [
   { path: 'cohorte/:id', component: CohorteVueComponent }, // Ajouté
   { path: 'employee-details/:id', component: EmployeeDetailsComponent },
   { path: 'apprenant-details/:id', component: ApprenantDetailsComponent }, // Ajouté
-  { path: 'departement/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un employé
-  { path: 'cohorte/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un apprenant
+  { path: 'departement/:id/ajout-utilisateur', component: UserFormComponent }, // Route pour ajouter un employé dans un département
+  {
+    path: 'departement/:id/edit-utilisateur/:userId',
+    component: UserFormComponent,
+  }, // Route pour éditer un utilisateur dans un département
+  { path: 'cohorte/:id/ajout-apprenant', component: ApprenantFormComponent },
+  {
+    path: 'cohorte/:id/edit-apprenant/:userId',
+    component: ApprenantFormComponent,
+  }, // Route pour éditer un apprenant dans une cohorte
   { path: '', redirectTo: 'login', pathMatch: 'full' }, // Redirection par défaut
   { path: 'login', component: ConnexionVigileComponent }, // Route vers ConnexionVigile
   { path: 'dashboard-vigile', component: DashboardVigileComponent }, // Route vers DashboardVigile

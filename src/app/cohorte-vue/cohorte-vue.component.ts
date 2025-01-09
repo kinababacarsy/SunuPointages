@@ -321,15 +321,26 @@ export class CohorteVueComponent implements OnInit {
 
   // Ajoutez cette méthode dans DepartementVueComponent
   redirectToAddUser(): void {
-    this.router.navigate(['/cohorte', this.cohorte.id, 'ajout-utilisateur']);
+    this.router.navigate(['/cohorte', this.cohorte.id, 'ajout-apprenant']);
   }
 
   // Éditer un apprenant
+  // Méthode pour éditer un apprenant
   editUser(user: any): void {
     console.log("Éditer l'apprenant", user);
-    // Logique pour éditer un apprenant
+    this.redirectToEditUser(user.id); // Redirige vers le formulaire d'édition
   }
-
+  // Dans votre composant (par exemple, DepartementVueComponent ou CohorteVueComponent)
+  redirectToEditUser(userId: string): void {
+    if (this.cohorte.id) {
+      this.router.navigate([
+        '/cohorte',
+        this.cohorte.id,
+        'edit-apprenant',
+        userId,
+      ]);
+    }
+  }
   // Assigner une carte à un apprenant
   assignCard(user: any): void {
     console.log('Assigner une carte à', user);

@@ -1,180 +1,224 @@
 <app-navbar></app-navbar>
-
 <div class="container">
-  <!-- En-tête du formulaire -->
   <div class="header">
     <a (click)="onRetour()" class="back-link">
       <i class="fas fa-arrow-left"></i>
-      {{ isCohorteContext ? "Nouvel apprenant" : "Nouvel utilisateur" }} -
-      {{ isCohorteContext ? "Cohorte" : "Département" }}
+      Nouvel employé - {{ nomDepartement }}
     </a>
   </div>
 
-  <!-- Formulaire -->
-  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
-    <!-- Photo de profil -->
-    <div class="form-group profile-pic-group">
-      <img
-        [src]="userForm.value.photo || 'assets/default-profile.png'"
-        alt="Photo de profil"
-        class="profile-pic"
-      />
-      <label for="photo" class="upload-label">
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <!-- Section Photo de profil -->
+    <div class="form-group">
+      <div class="profile-pic" (click)="triggerFileInput()">
+        <img
+          alt="Profile picture placeholder"
+          height="100"
+          [src]="
+            userForm.get('photo')?.value ||
+            'https://storage.googleapis.com/a1aa/image/c5MgSATs7EYSMlugHCw0MLJgO0HANCurcqJ1kg4hhzPxcXAF.jpg'
+          "
+          width="100"
+        />
         <i class="fas fa-plus-circle"></i>
         <input
-          id="photo"
+          #fileInput
           type="file"
           (change)="onFileChange($event)"
+          style="display: none"
           accept="image/*"
-          hidden
         />
-      </label>
+      </div>
+      <small *ngIf="userForm.get('photo')?.errors" class="error-message">
+        Veuillez sélectionner une image valide.
+      </small>
     </div>
 
-    <!-- Nom et Prénom -->
-    <div class="form-group double-field">
-      <div class="field">
-        <label for="nom">Nom <span class="required">*</span></label>
-        <input id="nom" formControlName="nom" placeholder="Entrer votre nom" />
-        <div
-          *ngIf="userForm.get('nom')?.invalid && userForm.get('nom')?.touched"
+    <!-- Section Nom et Prénom -->
+    <div class="form-group">
+      <div class="half-width">
+        <label for="nom">
+          <span class="required">*</span>
+          Nom
+        </label>
+        <input
+          id="nom"
+          formControlName="nom"
+          placeholder="Entrer votre nom"
+          type="text"
+        />
+        <small
+          *ngIf="
+            userForm.get('nom')?.errors?.['required'] &&
+            userForm.get('nom')?.touched
+          "
           class="error-message"
         >
           Le nom est obligatoire.
-        </div>
+        </small>
       </div>
-      <div class="field">
-        <label for="prenom">Prénom <span class="required">*</span></label>
+      <div class="half-width">
+        <label for="prenom">
+          <span class="required">*</span>
+          Prénom
+        </label>
         <input
           id="prenom"
           formControlName="prenom"
           placeholder="Entrer votre prénom"
+          type="text"
         />
-        <div
+        <small
           *ngIf="
-            userForm.get('prenom')?.invalid && userForm.get('prenom')?.touched
+            userForm.get('prenom')?.errors?.['required'] &&
+            userForm.get('prenom')?.touched
           "
           class="error-message"
         >
           Le prénom est obligatoire.
-        </div>
+        </small>
       </div>
     </div>
 
-    <!-- Email et Téléphone -->
-    <div class="form-group double-field">
-      <div class="field">
-        <label for="email">Email <span class="required">*</span></label>
+    <!-- Section Email et Téléphone -->
+    <div class="form-group">
+      <div class="half-width">
+        <label for="email">
+          <span class="required">*</span>
+          Email
+        </label>
         <input
           id="email"
           formControlName="email"
           placeholder="Entrer votre email"
           type="email"
         />
-        <div
+        <small
           *ngIf="
-            userForm.get('email')?.invalid && userForm.get('email')?.touched
+            userForm.get('email')?.errors?.['required'] &&
+            userForm.get('email')?.touched
           "
           class="error-message"
         >
-          L'email est obligatoire et doit être valide.
-        </div>
+          L'email est obligatoire.
+        </small>
+        <small
+          *ngIf="
+            userForm.get('email')?.errors?.['email'] &&
+            userForm.get('email')?.touched
+          "
+          class="error-message"
+        >
+          Veuillez entrer un email valide.
+        </small>
       </div>
-      <div class="field">
-        <label for="telephone">Téléphone <span class="required">*</span></label>
+      <div class="half-width">
+        <label for="telephone">
+          <span class="required">*</span>
+          Téléphone
+        </label>
         <input
           id="telephone"
           formControlName="telephone"
           placeholder="Entrer votre téléphone"
+          type="text"
         />
-        <div
+        <small
           *ngIf="
-            userForm.get('telephone')?.invalid &&
+            userForm.get('telephone')?.errors?.['required'] &&
             userForm.get('telephone')?.touched
           "
           class="error-message"
         >
           Le téléphone est obligatoire.
-        </div>
+        </small>
       </div>
     </div>
 
-    <!-- Rôle (uniquement pour les départements) -->
-    <div class="form-group" *ngIf="!isCohorteContext">
-      <label for="role">Rôle <span class="required">*</span></label>
-      <select id="role" formControlName="role" (change)="onRoleChange()">
-        <option value="employe">Employé</option>
-        <option value="admin">Admin</option>
-        <option value="vigile">Vigile</option>
-      </select>
+    <!-- Section Adresse et Rôle -->
+    <div class="form-group">
+      <div class="half-width">
+        <label for="adresse"> Adresse </label>
+        <input
+          id="adresse"
+          formControlName="adresse"
+          placeholder="Entrer votre adresse"
+          type="text"
+        />
+      </div>
+      <div class="half-width" *ngIf="!isEditMode">
+        <!-- Masquer en mode édition -->
+        <label for="role">
+          <span class="required">*</span>
+          Rôle
+        </label>
+        <select id="role" formControlName="role" (change)="onRoleChange()">
+          <option value="">Choisir un rôle</option>
+          <option value="employe">Employe</option>
+          <option value="admin">Admin</option>
+          <option value="vigile">Vigile</option>
+        </select>
+        <small
+          *ngIf="
+        !isEditMode &&
+        userForm.get('role')?.errors?.['required'] &&
+        userForm.get('role')?.touched
+      "
+          class="error-message"
+        >
+          Le rôle est obligatoire.
+        </small>
+      </div>
     </div>
 
-    <!-- Mot de passe et Confirmation (uniquement pour admin et vigile) -->
-    <div class="form-group double-field" *ngIf="showPasswordFields">
-      <div class="field">
-        <label for="mot_de_passe"
-          >Mot de passe <span class="required">*</span></label
-        >
+    <!-- Section Mot de passe -->
+    <div class="form-group" *ngIf="showPasswordFields && !isEditMode">
+      <!-- Masquer en mode édition -->
+      <div class="half-width">
+        <label for="mot_de_passe">
+          <span class="required">*</span>
+          Mot de passe
+        </label>
         <input
           id="mot_de_passe"
           formControlName="mot_de_passe"
           placeholder="Entrer votre mot de passe"
           type="password"
         />
-        <div
+        <small
           *ngIf="
-            userForm.get('mot_de_passe')?.invalid &&
-            userForm.get('mot_de_passe')?.touched
-          "
+        userForm.get('mot_de_passe')?.errors?.['required'] &&
+        userForm.get('mot_de_passe')?.touched
+      "
           class="error-message"
         >
-          Le mot de passe est obligatoire et doit contenir au moins 8
-          caractères.
-        </div>
-      </div>
-      <div class="field">
-        <label for="confirmation_mot_de_passe"
-          >Confirmation <span class="required">*</span></label
-        >
-        <input
-          id="confirmation_mot_de_passe"
-          formControlName="confirmation_mot_de_passe"
-          placeholder="Confirmer votre mot de passe"
-          type="password"
-        />
-        <div
+          Le mot de passe est obligatoire.
+        </small>
+        <small
           *ngIf="
-            userForm.hasError('passwordMismatch') &&
-            userForm.get('confirmation_mot_de_passe')?.touched
-          "
+        userForm.get('mot_de_passe')?.errors?.['minlength'] &&
+        userForm.get('mot_de_passe')?.touched
+      "
           class="error-message"
         >
-          Les mots de passe ne correspondent pas.
-        </div>
+          Le mot de passe doit contenir au moins 8 caractères.
+        </small>
       </div>
     </div>
-
-    <!-- Adresse -->
-    <div class="form-group">
-      <label for="adresse">Adresse</label>
-      <input
-        id="adresse"
-        formControlName="adresse"
-        placeholder="Entrer votre adresse"
-      />
-    </div>
-
-    <!-- Boutons -->
-    <div class="form-group buttons">
+    <!-- Boutons de soumission -->
+    <div class="buttons">
       <button type="button" class="btn-retour" (click)="onRetour()">
-        Retour
+        RETOUR
       </button>
       <button
         type="submit"
         class="btn-enregistrer"
-        [disabled]="userForm.invalid || isLoading"
+        [disabled]="isLoading || userForm.invalid"
       >
-        {{ isLoading ? "Enregistrement..." : "Enregistrer" }}
+        <span *ngIf="!isLoading">{{
+          isEditMode ? "Mettre à jour" : "Créer"
+        }}</span>
+        <span *ngIf="isLoading" class="loading-spinner"></span>
       </button>
     </div>
   </form>

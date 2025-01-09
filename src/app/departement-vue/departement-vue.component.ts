@@ -207,29 +207,34 @@ export class DepartementVueComponent implements OnInit {
   // Confirmer le changement de département
   confirmChangeDept(): void {
     if (this.userToChangeDept && this.newDepartementId) {
+      // Envoyer uniquement le champ departement_id
+      const userData = {
+        departement_id: this.newDepartementId,
+      };
+
+      // Envoyer la requête de mise à jour
       this.userService
-        .updateUser(this.userToChangeDept.id, {
-          departement_id: this.newDepartementId,
-        })
+        .updateUser(this.userToChangeDept.id, userData)
         .subscribe({
           next: () => {
-            // Recharger les données du département et des utilisateurs
             this.loadDepartementAndUsers(this.departement.id);
-
-            // Recharger les informations du département
-            this.reloadDepartement(this.departement.id);
-
             this.closeChangeDeptModal();
           },
           error: (error) => {
-            this.errorMessage =
-              'Erreur lors du changement de département. Veuillez réessayer.';
+            if (error.response && error.response.data) {
+              console.error("Détails de l'erreur :", error.response.data);
+              this.errorMessage =
+                error.response.data.message ||
+                'Erreur lors du changement de département.';
+            } else {
+              this.errorMessage =
+                'Erreur lors du changement de département. Veuillez réessayer.';
+            }
             console.error(error);
           },
         });
     }
   }
-
   // Ouvrir le modal de suppression multiple
   openDeleteMultipleModal(): void {
     this.showDeleteMultipleModal = true;
@@ -339,7 +344,7 @@ export class DepartementVueComponent implements OnInit {
     return users;
   }
 
-  // Ajoutez cette méthode dans DepartementVueComponent
+  // Rediriger vers le formulaire d'ajout d'un utilisateur
   redirectToAddUser(): void {
     this.router.navigate([
       '/departement',
@@ -347,19 +352,30 @@ export class DepartementVueComponent implements OnInit {
       'ajout-utilisateur',
     ]);
   }
-  // Ajoutez cette méthode dans DepartementVueComponent
+
+  // Rediriger vers le formulaire d'assignation d'une carte
   redirectToAssigneUser(): void {
     this.router.navigate([
-      '/assignation-carte',
+      '/departement',
       this.departement.id,
       'assignation-utilisateur',
+    ]);
+  }
+
+  // Rediriger vers le formulaire d'édition d'un utilisateur
+  redirectToEditUser(userId: string): void {
+    this.router.navigate([
+      '/departement',
+      this.departement.id,
+      'edit-utilisateur',
+      userId,
     ]);
   }
 
   // Éditer un utilisateur
   editUser(user: any): void {
     console.log("Éditer l'utilisateur", user);
-    // Logique pour éditer un utilisateur
+    this.redirectToEditUser(user.id); // Redirige vers le formulaire d'édition
   }
   // Assigner une carte à un utilisateur
   assignCard(user: any): void {

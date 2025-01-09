@@ -44,13 +44,10 @@ export class DashboardAdminComponent implements OnInit {
   private chart: any;
   selectedPeriod = 'day';
   selectedCreatedDate: string = '';
+  currentDate: string = new Date().toISOString().split('T')[0];
+  isFiltered: boolean = false; // Variable pour suivre si un filtre est appliqué
 
-  historiques: PresenceData[] = [
-    { status: 'present', count: 50 },
-    { status: 'absent', count: 15 },
-    { status: 'retard', count: 15 },
-    { status: 'congés/voyages', count: 15 },
-  ];
+  historiques: PresenceData[] = [];
 
   totalDepartements: any[] = [];
   totalCohortes: any[] = [];
@@ -62,6 +59,14 @@ export class DashboardAdminComponent implements OnInit {
   // Variables de pagination
   currentPage: number = 1;
   itemsPerPage: number = 2;
+
+  // Couleurs pour chaque statut
+  private statusColors: Record<string, string> = {
+    present: '#28a745', // Vert pour présent
+    absent: '#dc3545', // Rouge pour absent
+    retard: '#ffc107', // Jaune pour retard
+    'congés/voyages': '#ffc107', // Jaune pour congés/voyages
+  };
 
   constructor(public dashboardAdminService: DashboardAdminService) {}
 
@@ -79,16 +84,21 @@ export class DashboardAdminComponent implements OnInit {
       .getCountCohortes()
       .subscribe((data) => (this.totalCohortes = data.total_cohortes));
 
-    this.dashboardAdminService.getCountAllUsers().subscribe((data) => {
-      this.totalEmployes = data.employes;
-      this.totalApprenants = data.apprenants;
-      this.totalAdmins = data.admins;
-      this.totalVigiles = data.vigiles;
-    });
+    this.dashboardAdminService.getCountAllUsers().subscribe(
+      (data) => {
+        this.totalEmployes = data.employes;
+        this.totalApprenants = data.apprenants;
+        this.totalAdmins = data.admins;
+        this.totalVigiles = data.vigiles;
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des décomptes:', error);
+      }
+    );
   }
 
-  fetchUserPresences(): void {
-    this.dashboardAdminService.getUserPresences().subscribe(
+  fetchUserPresences(date?: string): void {
+    this.dashboardAdminService.getUserPresences(date).subscribe(
       (data: User[]) => {
         this.presences = data.map((user) => ({
           ...user,
@@ -98,6 +108,8 @@ export class DashboardAdminComponent implements OnInit {
           createdAt: new Date().toISOString().split('T')[0], // Date de création par défaut
         }));
         this.filteredPresences = this.presences;
+        this.isFiltered = false; // Réinitialiser le filtre
+        this.updateChart(); // Mettre à jour le diagramme après avoir récupéré les présences
       },
       (error) => {
         console.error('Error fetching user presences:', error);
@@ -129,11 +141,11 @@ export class DashboardAdminComponent implements OnInit {
     this.chart = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: this.historiques.map((item) => item.status),
+        labels: [],
         datasets: [
           {
-            data: this.historiques.map((item) => item.count),
-            backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+            data: [],
+            backgroundColor: ['#dc3545', '#ffc107', '#28a745', '#ffc107'],
           },
         ],
       },
@@ -163,38 +175,68 @@ export class DashboardAdminComponent implements OnInit {
     });
   }
 
+  private updateChart(): void {
+    if (!this.chart) return;
+
+    const presenceStatusCounts: Record<string, number> = {};
+    const presencesToUse = this.isFiltered
+      ? this.filteredPresences
+      : this.presences;
+
+    presencesToUse.forEach((presence) => {
+      if (presenceStatusCounts[presence.status]) {
+        presenceStatusCounts[presence.status]++;
+      } else {
+        presenceStatusCounts[presence.status] = 1;
+      }
+    });
+
+    const labels = Object.keys(presenceStatusCounts);
+    const data = Object.values(presenceStatusCounts);
+
+    this.historiques = labels.map((status, index) => ({
+      status,
+      count: data[index],
+    }));
+
+    this.chart.data.labels = labels;
+    this.chart.data.datasets[0].data = data;
+    this.chart.update();
+  }
+
   calculateTotal(): number {
     return this.historiques.reduce((acc, curr) => acc + curr.count, 0);
   }
 
   updateChartPeriod(event: Event): void {
-    const periodData: Record<PeriodKey, PresenceData[]> = {
-      day: [
-        { status: 'present', count: 150 },
-        { status: 'absent', count: 20 },
-        { status: 'retard', count: 30 },
-      ],
-      week: [
-        { status: 'present', count: 750 },
-        { status: 'absent', count: 100 },
-        { status: 'retard', count: 150 },
-      ],
-      month: [
-        { status: 'present', count: 3000 },
-        { status: 'absent', count: 400 },
-        { status: 'retard', count: 600 },
-      ],
-    };
-
     const selectElement = event.target as HTMLSelectElement;
     const period = selectElement.value as PeriodKey;
 
-    this.historiques = periodData[period];
+    // Calculer les données de présence en fonction des présences filtrées ou non filtrées
+    const presenceStatusCounts: Record<string, number> = {};
+    const presencesToUse = this.isFiltered
+      ? this.filteredPresences
+      : this.presences;
+
+    presencesToUse.forEach((presence) => {
+      if (presenceStatusCounts[presence.status]) {
+        presenceStatusCounts[presence.status]++;
+      } else {
+        presenceStatusCounts[presence.status] = 1;
+      }
+    });
+
+    const labels = Object.keys(presenceStatusCounts);
+    const data = Object.values(presenceStatusCounts);
+
+    this.historiques = labels.map((status, index) => ({
+      status,
+      count: data[index],
+    }));
 
     if (this.chart) {
-      this.chart.data.datasets[0].data = this.historiques.map(
-        (item) => item.count
-      );
+      this.chart.data.labels = labels;
+      this.chart.data.datasets[0].data = data;
       this.chart.update();
     }
   }
@@ -205,18 +247,20 @@ export class DashboardAdminComponent implements OnInit {
     this.filteredPresences = this.presences.filter((presence) => {
       return type === 'all' || presence.type === type;
     });
+    this.isFiltered = true; // Mettre à jour la variable de filtrage
     this.currentPage = 1; // Reset to the first page
+    this.updateChart(); // Mettre à jour le diagramme après le filtrage
   }
 
   filterByCreatedDate(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    this.selectedCreatedDate = inputElement.value;
-    this.filteredPresences = this.presences.filter((presence) => {
-      return (
-        !this.selectedCreatedDate ||
-        presence.createdAt === this.selectedCreatedDate
-      );
-    });
+    const selectElement = event.target as HTMLSelectElement;
+    const date = selectElement.value;
+    if (date === '') {
+      this.fetchUserPresences(); // Récupérer toutes les présences sans filtre de date
+    } else {
+      this.fetchUserPresences(date);
+    }
+    this.isFiltered = true; // Mettre à jour la variable de filtrage
     this.currentPage = 1; // Reset to the first page
   }
 
@@ -229,6 +273,8 @@ export class DashboardAdminComponent implements OnInit {
         presence.nom.toLowerCase().includes(query)
       );
     });
+    this.isFiltered = true; // Mettre à jour la variable de filtrage
     this.currentPage = 1; // Reset to the first page
+    this.updateChart(); // Mettre à jour le diagramme après le filtrage
   }
 }

@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DashboardAdminService {
   private apiUrl = 'http://127.0.0.1:8000/api'; // Remplacez par l'URL de votre API
@@ -32,8 +32,12 @@ export class DashboardAdminService {
     return this.http.get<any>(`${this.apiUrl}/users/count`);
   }
 
-  getUserPresences(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/users/presences`);
+  getUserPresences(date?: string): Observable<any> {
+    let url = `${this.apiUrl}/users/presences`;
+    if (date) {
+      url += `?date=${date}`;
+    }
+    return this.http.get<any>(url);
   }
 
   getUserHistorique(): Observable<any> {

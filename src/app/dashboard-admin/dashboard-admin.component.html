@@ -1,6 +1,6 @@
-<app-navbar></app-navbar>
-
 <div class="dashboard-container">
+  <app-navbar></app-navbar>
+
   <main class="dashboard-content">
     <!-- Cards Section -->
     <div class="stats-cards">
@@ -95,7 +95,7 @@
                 <input
                   type="text"
                   class="form-control"
-                  placeholder="Rechercher..."
+                  placeholder="Rechercher nom..."
                   (input)="filterByName($event)"
                 />
               </div>
@@ -132,7 +132,7 @@
             >
               Précédent
             </button>
-            <span>Page {{ currentPage }} of {{ getTotalPages() }}</span>
+            <span>page {{ currentPage }} </span>
             <button
               (click)="changePage(currentPage + 1)"
               [disabled]="currentPage === getTotalPages()"
@@ -147,7 +147,7 @@
       <div class="card h-5">
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Historiques</h5>
+            <h5 class="mb-0">Historique des Pointages</h5>
             <select
               class="form-select"
               style="width: auto"

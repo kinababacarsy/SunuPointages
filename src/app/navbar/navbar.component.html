@@ -1,10 +1,6 @@
 <div class="navbar">
   <!-- Logo à gauche -->
-  <img
-    class="logo"
-    src="https://storage.googleapis.com/a1aa/image/3399sJrfL4XeOkYdUejvlHSW1pm1Ny2belLB2GNALff3kBofJA.jpg"
-    alt="Logo"
-  />
+  <img class="logo" src="/sunuPointage.png" alt="Logo" />
 
   <!-- Liens de navigation (centrés) -->
   <div class="nav-links">
@@ -17,9 +13,6 @@
     <a class="nav-item" routerLink="/cohortes">
       <i class="bi bi-people"></i> Cohortes
     </a>
-    <a class="nav-item" routerLink="/cartes">
-      <i class="bi bi-card-list"></i> Gestion des Pointages
-    </a>
   </div>
 
   <!-- Déconnexion à droite -->
@@ -31,7 +24,7 @@
   <!-- Image utilisateur à droite -->
   <img
     class="user-profile"
-    src="https://storage.googleapis.com/a1aa/image/x1VNAoCopYa7LBs2CxMCAlk02eODEi5erlleuPi9Qh4oMA9nA.jpg"
+    [src]="user?.photo || 'https://via.placeholder.com/150'"
     alt="User Profile"
   />
 </div>

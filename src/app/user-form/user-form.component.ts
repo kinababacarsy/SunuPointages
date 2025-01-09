@@ -1,209 +1,210 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
-  Validators,
-  ReactiveFormsModule,
   FormsModule,
-  AbstractControl,
+  ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService, User } from '../user.service';
+import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-user-form',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, ReactiveFormsModule], // Importer FormsModule pour le two-way binding
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.css'],
 })
 export class UserFormComponent implements OnInit {
-  departementId: string | null = null;
-  cohorteId: string | null = null;
+  @ViewChild('fileInput') fileInput!: ElementRef;
+
   userForm: FormGroup;
-  showPasswordFields: boolean = false;
-  isCohorteContext: boolean = false;
-  isEditMode: boolean = false;
+  isLoading = false;
+  isEditMode = false;
+  showPasswordFields = false;
+  departementId: string | null = null;
+  nomDepartement: string = '';
   userId: string | null = null;
-  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
-    this.userForm = this.fb.group(
-      {
-        nom: ['', Validators.required],
-        prenom: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        telephone: ['', Validators.required],
-        adresse: [''],
-        photo: [''],
-        role: ['', Validators.required],
-        mot_de_passe: [''],
-        confirmation_mot_de_passe: [''],
-      },
-      { validator: this.passwordMatchValidator }
-    );
+    this.userForm = this.createForm();
   }
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      this.departementId = params.get('departementId');
-      this.cohorteId = params.get('cohorteId');
-      this.userId = params.get('userId');
-      this.isCohorteContext = !!this.cohorteId;
+  ngOnInit() {
+    // Récupérer l'ID du département depuis l'URL si présent
+    this.departementId = this.route.snapshot.paramMap.get('id'); // 'id' au lieu de 'departementId'
+    console.log('ID du département:', this.departementId); // Vérifiez la valeur dans la console
 
-      if (this.isCohorteContext) {
-        this.userForm.patchValue({ role: 'apprenant' });
-      } else if (this.departementId) {
-        this.userForm.patchValue({ role: 'employe' });
-      }
+    // Si un userId est présent, c'est le mode édition
+    this.userId = this.route.snapshot.paramMap.get('userId');
+    if (this.userId) {
+      this.isEditMode = true;
+      this.loadUserData();
+    }
 
-      if (this.userId) {
-        this.isEditMode = true;
-        this.userService.getUser(this.userId).subscribe((user: User) => {
-          this.userForm.patchValue(user);
-          this.onRoleChange();
-        });
-      }
+    // Initialiser le formulaire avec les validateurs appropriés
+    this.userForm = this.createForm();
 
-      this.onRoleChange();
+    // Appeler onRoleChange pour configurer les validateurs et les champs conditionnels
+    this.onRoleChange();
+  }
+
+  createForm(): FormGroup {
+    const form = this.fb.group({
+      nom: ['', [Validators.required]],
+      prenom: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      telephone: ['', [Validators.required]],
+      adresse: [''],
+      role: [
+        { value: 'employe', disabled: this.isEditMode },
+        [Validators.required],
+      ], // Désactiver en mode édition
+      photo: [''],
+      mot_de_passe: [
+        { value: '', disabled: this.isEditMode }, // Désactiver en mode édition
+        this.isEditMode ? [] : [Validators.required, Validators.minLength(8)],
+      ],
+      confirmation_mot_de_passe: [{ value: '', disabled: this.isEditMode }], // Désactiver en mode édition
     });
+
+    return form;
   }
-
-  onRoleChange(): void {
-    const roleControl = this.userForm.get('role');
-    const motDePasseControl = this.userForm.get('mot_de_passe');
-    const confirmationMotDePasseControl = this.userForm.get(
-      'confirmation_mot_de_passe'
-    );
-
-    if (roleControl && motDePasseControl && confirmationMotDePasseControl) {
-      const role = roleControl.value;
-      this.showPasswordFields = role === 'admin' || role === 'vigile';
-
-      if (this.showPasswordFields) {
-        motDePasseControl.setValidators([
-          Validators.required,
-          Validators.minLength(8),
-        ]);
-        confirmationMotDePasseControl.setValidators([Validators.required]);
-      } else {
-        motDePasseControl.clearValidators();
-        confirmationMotDePasseControl.clearValidators();
-      }
-
-      motDePasseControl.updateValueAndValidity();
-      confirmationMotDePasseControl.updateValueAndValidity();
-    }
-  }
-
-  onSubmit(): void {
-    if (this.userForm.invalid) {
-      this.userForm.markAllAsTouched();
-      return;
-    }
-
-    this.isLoading = true;
-
-    const userData: User = this.userForm.value;
-    delete userData.confirmation_mot_de_passe;
-
-    if (!this.showPasswordFields) {
-      delete userData.mot_de_passe;
-    }
-
-    if (this.isEditMode) {
-      this.userService.updateUser(this.userId!, userData).subscribe(
-        (response: User) => {
-          console.log('Utilisateur mis à jour avec succès :', response);
-          this.onRetour();
+  loadUserData() {
+    if (this.userId) {
+      this.userService.getUser(this.userId).subscribe({
+        next: (user: User) => {
+          this.userForm.patchValue({
+            nom: user.nom,
+            prenom: user.prenom,
+            email: user.email,
+            telephone: user.telephone,
+            adresse: user.adresse,
+            role: user.role,
+            photo: user.photo,
+          });
+          this.onRoleChange(); // Mettre à jour l'affichage des champs de mot de passe
         },
-        (error: any) => {
+        error: (error) => {
           console.error(
-            "Erreur lors de la mise à jour de l'utilisateur :",
+            'Erreur lors du chargement des données utilisateur:',
             error
           );
-          this.isLoading = false;
-        }
-      );
+        },
+      });
+    }
+  }
+
+  onRoleChange() {
+    const role = this.userForm.get('role')?.value;
+    this.showPasswordFields = role === 'admin' || role === 'vigile';
+
+    if (this.showPasswordFields && !this.isEditMode) {
+      // Si le rôle est "admin" ou "vigile" et que nous sommes en mode création, le mot de passe est obligatoire
+      this.userForm
+        .get('mot_de_passe')
+        ?.setValidators([Validators.required, Validators.minLength(8)]);
     } else {
-      if (this.departementId) {
-        this.userService
-          .createUserFromDepartement(this.departementId, userData)
-          .subscribe(
-            (response: User) => {
-              console.log('Utilisateur créé avec succès :', response);
-              this.onRetour();
-            },
-            (error: any) => {
-              console.error(
-                "Erreur lors de la création de l'utilisateur :",
-                error
-              );
-              this.isLoading = false;
-            }
-          );
-      } else if (this.cohorteId) {
-        this.userService
-          .createUserFromCohorte(this.cohorteId, userData)
-          .subscribe(
-            (response: User) => {
-              console.log('Apprenant créé avec succès :', response);
-              this.onRetour();
-            },
-            (error: any) => {
-              console.error(
-                "Erreur lors de la création de l'apprenant :",
-                error
-              );
-              this.isLoading = false;
-            }
-          );
-      }
+      // Pour le rôle "employé" ou en mode édition, le mot de passe est optionnel
+      this.userForm.get('mot_de_passe')?.setValidators([]);
     }
+
+    // Mettre à jour la validation du champ
+    this.userForm.get('mot_de_passe')?.updateValueAndValidity();
   }
 
-  onRetour(): void {
-    if (this.departementId) {
-      this.router.navigate(['/departement', this.departementId]);
-    } else if (this.cohorteId) {
-      this.router.navigate(['/cohorte', this.cohorteId]);
-    }
+  triggerFileInput() {
+    this.fileInput.nativeElement.click();
   }
 
-  onFileChange(event: any): void {
-    const file = event.target.files[0];
+  onFileChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
+      // Ici, vous pouvez ajouter la logique pour gérer le téléchargement de la photo
+      // Pour l'instant, nous allons simplement stocker l'URL de la photo
       const reader = new FileReader();
       reader.onload = () => {
         this.userForm.patchValue({
-          photo: reader.result as string,
+          photo: reader.result,
         });
       };
       reader.readAsDataURL(file);
     }
   }
 
-  passwordMatchValidator(formGroup: FormGroup) {
-    const motDePasseControl = formGroup.get('mot_de_passe');
-    const confirmationMotDePasseControl = formGroup.get(
-      'confirmation_mot_de_passe'
-    );
+  onSubmit() {
+    console.log('Formulaire valide:', this.userForm.valid); // Afficher la validité du formulaire
+    console.log('Erreurs du formulaire:', this.userForm.errors); // Afficher les erreurs globales du formulaire
+    console.log(
+      'Erreurs du champ mot_de_passe:',
+      this.userForm.get('mot_de_passe')?.errors
+    ); // Afficher les erreurs du champ mot_de_passe
 
-    if (motDePasseControl && confirmationMotDePasseControl) {
-      const motDePasse = motDePasseControl.value;
-      const confirmationMotDePasse = confirmationMotDePasseControl.value;
+    if (this.userForm.valid) {
+      this.isLoading = true;
 
-      if (motDePasse !== confirmationMotDePasse) {
-        confirmationMotDePasseControl.setErrors({ passwordMismatch: true });
-      } else {
-        confirmationMotDePasseControl.setErrors(null);
+      // Récupérer les valeurs du formulaire, y compris les champs désactivés
+      const userData: User = this.userForm.getRawValue();
+
+      // Supprimer la confirmation du mot de passe avant l'envoi
+      delete userData.confirmation_mot_de_passe;
+
+      // Si le mot de passe est vide en mode édition, ne pas l'envoyer au serveur
+      if (this.isEditMode && !userData.mot_de_passe) {
+        delete userData.mot_de_passe; // Supprimer le champ mot_de_passe de l'objet userData
       }
+
+      // Afficher les données du formulaire dans la console
+      console.log('Données du formulaire:', userData);
+
+      if (this.isEditMode) {
+        // Mise à jour d'un utilisateur existant avec PATCH
+        this.userService.updateUser(this.userId!, userData).subscribe({
+          next: () => this.handleSuccess(),
+          error: (error) => this.handleError(error),
+          complete: () => (this.isLoading = false),
+        });
+      } else if (this.departementId) {
+        // Création d'un utilisateur dans un département
+        this.userService
+          .createUserFromDepartement(this.departementId, userData)
+          .subscribe({
+            next: () => this.handleSuccess(),
+            error: (error) => this.handleError(error),
+            complete: () => (this.isLoading = false),
+          });
+      }
+    } else {
+      console.log('Le formulaire est invalide. Veuillez corriger les erreurs.');
+    }
+  }
+  private handleSuccess() {
+    // Rediriger vers la page appropriée après le succès
+    if (this.departementId) {
+      this.router.navigate(['/departement', this.departementId]); // 'departement' au lieu de 'departements'
+    } else {
+      this.router.navigate(['/users']);
+    }
+  }
+
+  private handleError(error: any) {
+    console.error('Erreur:', error);
+    this.isLoading = false;
+    // Ici, vous pouvez ajouter la logique pour afficher un message d'erreur à l'utilisateur
+  }
+
+  onRetour() {
+    if (this.departementId) {
+      this.router.navigate(['/departement', this.departementId]); // 'departement' au lieu de 'departements'
+    } else {
+      this.router.navigate(['/users']);
     }
   }
 }
