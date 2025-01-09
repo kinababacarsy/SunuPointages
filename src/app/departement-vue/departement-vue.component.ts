@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { AssignationCarteComponent } from '../assignation-carte/assignation-carte.component';
+import { AssignationCarteComponent } from '../assignation-carte/assignation-carte.component';  //import du component d'assignation
 
 @Component({
   selector: 'app-departement-vue',

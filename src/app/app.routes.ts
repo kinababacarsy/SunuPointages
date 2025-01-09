@@ -15,7 +15,7 @@ import { PointageComponent } from './liste-vigile/liste-vigile.component';
 
 // Configuration des routes
 export const routes: Routes = [
-  { path: 'dashboard-admin', component: DashboardAdminComponent },
+  { path: 'dashboard-admin', component: DashboardAdminComponent }, //route pour l'interface de l'admin
   { path: 'departements', component: DepartementsComponent },
   { path: 'cohortes', component: CohortesComponent },
   { path: 'pointage', component: PointageComponent },
@@ -29,6 +29,6 @@ export const routes: Routes = [
   { path: 'login', component: ConnexionVigileComponent }, // Route vers ConnexionVigile
   { path: 'dashboard-vigile', component: DashboardVigileComponent }, // Route vers DashboardVigile
   { path: 'liste-vigile', component: PointageComponent }, // Route vers ListeVigile
-  { path: 'assignation-carte/:id', component: AssignationCarteComponent },
+  { path: 'assignation-carte/:id', component: AssignationCarteComponent }, //route pour assigner une carte à un utilisateur
 
 ];
