@@ -6,7 +6,11 @@
     </div>
     <h1 class="title">SUNU POINTAGE</h1>
     <div class="profile">
-      <img src="vigile.png" alt="Profile" class="profile-img" />
+      <img
+        class="user-profile"
+        [src]="user?.photo || 'https://via.placeholder.com/150'"
+        alt="User Profile"
+      />
     </div>
   </header>
 

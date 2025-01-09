@@ -26,6 +26,7 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
   };
 
   errorMessages: string[] = [];
+  user: any; // Pour stocker les informations de l'utilisateur connecté
   private messageSubscription!: Subscription;
 
   constructor(
@@ -33,7 +34,11 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private websocketService: WebSocketService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    // Récupérez les informations de l'utilisateur connecté depuis le localStorage
+    const userData = localStorage.getItem('user');
+    this.user = userData ? JSON.parse(userData) : null;
+  }
 
   ngOnInit() {
     this.messageSubscription = this.websocketService.message$.subscribe(
