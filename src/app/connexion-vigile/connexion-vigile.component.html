@@ -1,3 +1,4 @@
+<!-- src/app/connexion-vigile/connexion-vigile.component.html -->
 <div class="login-wrapper">
     <div class="login-card">
         <div class="logo">
@@ -18,14 +19,14 @@
                 <div class="password-container">
                     <input [type]="showPassword ? 'text' : 'password'" id="password" name="password" [(ngModel)]="loginData.password" required placeholder="Entrer votre mot de passe" (ngModelChange)="onPasswordChange()" />
                     <button type="button" (click)="togglePasswordVisibility()" class="eye-icon">
-                        <i *ngIf="showPassword" class="fas fa-eye-slash"></i>
-                        <i *ngIf="!showPassword" class="fas fa-eye"></i>
-                    </button>
+              <i *ngIf="showPassword" class="fas fa-eye-slash"></i>
+              <i *ngIf="!showPassword" class="fas fa-eye"></i>
+            </button>
                 </div>
                 <div *ngIf="showPasswordError" class="error-message">
                     Le mot de passe doit contenir 8 caractères
                 </div>
-                <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+                <p class="forgot-password" (click)="onForgotPassword()">Mot de passe oublié ?</p>
             </div>
 
             <!-- Message d'erreur générique si email ou mot de passe incorrect -->
@@ -34,9 +35,20 @@
             </div>
 
             <button type="submit" class="login-button" [disabled]="!loginForm.valid || showEmailError || showPasswordError">
-                Login
-            </button>
+          Login
+        </button>
         </form>
-        <p class="rfid-link">Se connecter avec sa carte RFID</p>
+        <p class="rfid-link" (click)="onCardIDClick()">Se connecter avec sa carte RFID</p>
+    </div>
+</div>
+
+<!-- Modal pour la connexion avec carte RFID -->
+<div class="modal" *ngIf="showModal">
+    <div class="modal-content">
+        <h2>Scanner la carte RFID</h2>
+        <label for="cardID">Carte RFID</label>
+        <input type="text" id="cardID" [(ngModel)]="cardID" placeholder="Scannez votre carte" />
+        <!-- <button (click)="loginWithCardID(cardID)">Se connecter</button> -->
+        <button (click)="closeModal()">Annuler</button>
     </div>
 </div>

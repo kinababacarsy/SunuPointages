@@ -43,14 +43,14 @@
                 <tr *ngFor="let pointage of pointages">
                     <td>{{ pointage.matricule }}</td>
                     <td>{{ pointage.nom }}</td>
-                    <td>{{ pointage.departement }}</td>
+                    <!-- <td>{{ pointage.departement }}</td>
                     <td>{{ pointage.premierPointage || '---' }}</td>
                     <td>{{ pointage.dernierPointage || '---' }}</td>
-                    <td>
-                        <span class="status" [ngClass]="getStatusClass(pointage.statut)">
+                    <td> -->
+                    <span class="status" [ngClass]="getStatusClass(pointage.statut)">
                     {{ pointage.statut }}
                 </span>
-                    </td>
+                    <!-- </td> -->
                 </tr>
             </tbody>
         </table>
