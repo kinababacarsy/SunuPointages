@@ -25,24 +25,39 @@ export class ConnexionVigileComponent {
   constructor(private loginService: LoginService, private router: Router) {}
 
   onSubmit() {
+    // Réinitialiser le message d'erreur
+    this.errorMessage = null;
+
     // Appel à la méthode login du LoginService
-    this.loginService.login(this.loginData.email, this.loginData.password).subscribe(
-      (response) => {
-        // Si la connexion réussit, stocke le token dans localStorage
-        localStorage.setItem('token', response.token);
-        // Redirige l'utilisateur vers une autre page, comme le dashboard
-        this.router.navigate(['/dashboard-vigile']);
-        console.log('Utilisateur connecté');
-      },
-      (error) => {
-        // Si la connexion échoue, affiche un message d'erreur
-        if (error.status === 401) {
-          this.errorMessage = 'Email ou mot de passe incorrect';
-        } else {
-          this.errorMessage = 'Erreur de connexion, veuillez réessayer';
+    this.loginService
+      .login(this.loginData.email, this.loginData.password)
+      .subscribe(
+        (response) => {
+          // Si la connexion réussit, stocke le token et les informations de l'utilisateur dans localStorage
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
+
+          // Rediriger l'utilisateur en fonction de son rôle
+          if (response.user.role === 'admin') {
+            this.router.navigate(['/dashboard-admin']);
+          } else if (response.user.role === 'vigile') {
+            this.router.navigate(['/dashboard-vigile']);
+          } else {
+            // Redirection par défaut si le rôle n'est pas reconnu
+            this.router.navigate(['/departements']);
+          }
+
+          console.log('Utilisateur connecté');
+        },
+        (error) => {
+          // Si la connexion échoue, affiche un message d'erreur
+          if (error.status === 401) {
+            this.errorMessage = 'Email ou mot de passe incorrect';
+          } else {
+            this.errorMessage = 'Erreur de connexion, veuillez réessayer';
+          }
         }
-      }
-    );
+      );
   }
 
   togglePasswordVisibility() {
@@ -51,11 +66,13 @@ export class ConnexionVigileComponent {
 
   onEmailChange() {
     // Vérifie si l'email contient un '@' ou s'il est vide
-    this.showEmailError = this.loginData.email.length > 0 && !this.loginData.email.includes('@');
+    this.showEmailError =
+      this.loginData.email.length > 0 && !this.loginData.email.includes('@');
   }
 
   onPasswordChange() {
     // Affiche le message d'erreur si le mot de passe est inférieur à 8 caractères
-    this.showPasswordError = this.loginData.password.length > 0 && this.loginData.password.length < 8;
+    this.showPasswordError =
+      this.loginData.password.length > 0 && this.loginData.password.length < 8;
   }
 }

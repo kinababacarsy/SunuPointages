@@ -27,6 +27,9 @@ export interface User {
   providedIn: 'root',
 })
 export class UserService {
+  checkCardStatus(arg0: any, cardID: string) {
+    throw new Error('Method not implemented.');
+  }
   private apiUrl = 'http://localhost:8000/api'; // URL de votre API
 
   constructor() {}

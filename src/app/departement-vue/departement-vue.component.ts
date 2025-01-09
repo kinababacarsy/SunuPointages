@@ -355,10 +355,8 @@ export class DepartementVueComponent implements OnInit {
     console.log("Éditer l'utilisateur", user);
     // Logique pour éditer un utilisateur
   }
-    // Assigner une carte à un employé
-    assignCard(user: any): void {
-      this.router.navigate(['./assignation-carte'], { state: { user}});
-      console.log('Assigner une carte à', user);
-      // Logique pour assigner une carte
-    }
+   // Assigner une carte à un apprenant
+  assignCard(userId: string) {
+    this.router.navigate(['/assignation-carte', userId]);
+  }
 }

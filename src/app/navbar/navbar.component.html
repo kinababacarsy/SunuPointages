@@ -9,7 +9,7 @@
   <!-- Liens de navigation (centrés) -->
   <div class="nav-links">
     <a class="nav-item" routerLink="/dashboard-admin">
-      <i class="bi bi-house-door"></i> Acceuil
+      <i class="bi bi-house-door"></i> Dashboard
     </a>
     <a class="nav-item" routerLink="/departements">
       <i class="bi bi-building"></i> Départements
@@ -23,7 +23,7 @@
   </div>
 
   <!-- Déconnexion à droite -->
-  <a class="nav-item logout" routerLink="/logout">
+  <a class="nav-item logout" (click)="deconnexion()">
     DECONNEXION
     <i class="bi bi-box-arrow-right"></i>
   </a>
