@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { UserService } from '../user.service';
+import { UserService, User } from '../user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -8,7 +8,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
 @Component({
   selector: 'app-employee-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent], // Importer FormsModule pour le two-way binding
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './employee-details.component.html',
   styleUrls: ['./employee-details.component.css'],
 })
@@ -16,10 +16,20 @@ export class EmployeeDetailsComponent implements OnInit {
   employee: any = null; // Données de l'employé
   isLoading: boolean = true;
   errorMessage: string | null = null;
+  updateData: string = '';
 
   // Variables pour la sélection de la semaine
   selectedWeek: Date = new Date(); // Semaine sélectionnée (par défaut, la semaine actuelle)
-  weekDates: Date[] = []; // Dates de la semaine sélectionnée (lundi à vendredi)
+  weekDates: { date: Date; data: string[] }[] = []; // Dates de la semaine sélectionnée (lundi à vendredi) avec données
+  headers = [
+    'Date',
+    'Arrivée',
+    'Départ',
+    'Retard',
+    'Absence',
+    'Commentaire',
+    'Teams',
+  ]; // En-têtes de la table
 
   // Variables pour le modal d'absence
   showAbsenceModal: boolean = false; // Contrôle l'affichage du modal
@@ -62,6 +72,43 @@ export class EmployeeDetailsComponent implements OnInit {
     });
   }
 
+  // Basculer le statut de l'employé
+  toggleStatus(): void {
+    const newStatus = this.employee.status === 'Actif' ? 'Inactif' : 'Actif';
+    this.updateEmployeeStatus(newStatus);
+  }
+
+  // Dans employee-details.component.ts
+  updateEmployeeStatus(newStatus: string): void {
+    if (!this.employee?.id) {
+      console.error("ID de l'employé non défini");
+      return;
+    }
+
+    // Crée un objet updateData conforme à Partial<User>
+    const updateData: Partial<User> = {
+      status: newStatus, // Envoie uniquement le statut
+    };
+
+    // Utilise la méthode updateUser existante
+    this.userService.updateUser(this.employee.id, updateData).subscribe({
+      next: () => {
+        console.log('Statut mis à jour avec succès');
+        if (this.employee) {
+          this.employee.status = newStatus; // Met à jour le statut localement
+        }
+        alert('Statut mis à jour avec succès !');
+      },
+      error: (error) => {
+        console.error(
+          'Erreur lors de la mise à jour du statut',
+          error.response?.data
+        );
+        alert('Erreur lors de la mise à jour du statut. Veuillez réessayer.');
+      },
+    });
+  }
+
   // Générer les dates de la semaine (lundi à vendredi)
   generateWeekDates(startDate: Date): void {
     this.weekDates = [];
@@ -72,7 +119,7 @@ export class EmployeeDetailsComponent implements OnInit {
       // Générer uniquement 5 jours (lundi à vendredi)
       const date = new Date(startOfWeek);
       date.setDate(date.getDate() + i);
-      this.weekDates.push(date);
+      this.weekDates.push({ date: date, data: ['-', '-', '-', '-', '-', '-'] });
     }
   }
 

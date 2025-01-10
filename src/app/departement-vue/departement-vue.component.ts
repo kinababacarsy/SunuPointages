@@ -15,6 +15,20 @@ import { NavbarComponent } from '../navbar/navbar.component';
   styleUrls: ['./departement-vue.component.css'],
 })
 export class DepartementVueComponent implements OnInit {
+  headers = [
+    'Sélection',
+    'Profil',
+    'Nom et Prénom',
+    'Matricule',
+    'Département',
+    'Téléphone',
+    'Email',
+    'Carte',
+    'Actions',
+    '',
+    '',
+    '',
+  ];
   departement: any; // Informations du département
   users: any[] = []; // Liste complète des utilisateurs
   filteredUsers: any[] = []; // Liste des utilisateurs filtrés
@@ -33,6 +47,9 @@ export class DepartementVueComponent implements OnInit {
   departements: any[] = []; // Liste des départements disponibles
   sortField: string = 'nom'; // Champ de tri
   sortOrder: string = 'asc'; // Ordre de tri
+  paginatedUsers: any[] = []; // Résultats paginés
+  importedUsers: any[] = []; // Utilisateurs importés via CSV
+  showImportModal: boolean = false; // Afficher le modal d'importation
 
   constructor(
     private route: ActivatedRoute,
@@ -111,31 +128,46 @@ export class DepartementVueComponent implements OnInit {
     });
   }
 
-  // Mettre à jour la pagination
-  updatePagination(): void {
-    const totalPages = Math.ceil(this.filteredUsers.length / 10);
-    this.pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-    this.goToPage(1); // Revenir à la première page après filtrage
-  }
-
-  // Naviguer vers une page spécifique
-  goToPage(page: number): void {
-    this.currentPage = page;
-    const start = (page - 1) * 10;
-    const end = start + 10;
-    this.filteredUsers = this.users.slice(start, end);
+  // Fonction pour normaliser une chaîne et ignorer les accents
+  normalizeString(str: string): string {
+    return str
+      .normalize('NFD') // Décompose les caractères accentués
+      .replace(/[\u0300-\u036f]/g, '') // Supprime les diacritiques
+      .toLowerCase(); // Convertit en minuscules
   }
 
   // Filtrer les utilisateurs en fonction du terme de recherche
   filterUsers(): void {
+    const normalizedSearchTerm = this.normalizeString(this.searchTerm);
+
     this.filteredUsers = this.users.filter(
       (user) =>
-        user.nom.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        user.prenom.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        user.matricule.toLowerCase().includes(this.searchTerm.toLowerCase())
+        this.normalizeString(user.nom).includes(normalizedSearchTerm) ||
+        this.normalizeString(user.prenom).includes(normalizedSearchTerm) ||
+        this.normalizeString(user.matricule).includes(normalizedSearchTerm) ||
+        this.normalizeString(user.email).includes(normalizedSearchTerm)
     );
     this.sortUsers();
     this.updatePagination();
+  }
+
+  // Mettre à jour la pagination
+  updatePagination(): void {
+    const totalPages = Math.ceil(this.filteredUsers.length / 10);
+    this.pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+    this.goToPage(1); // Revenir à la première page après filtrage ou tri
+  }
+
+  // Naviguer vers une page spécifique
+  goToPage(page: number): void {
+    if (page < 1 || page > this.pages.length) {
+      return; // Ne rien faire si la page est invalide
+    }
+
+    this.currentPage = page;
+    const start = (page - 1) * 10;
+    const end = start + 10;
+    this.paginatedUsers = this.filteredUsers.slice(start, end);
   }
 
   // Trier les utilisateurs
@@ -235,6 +267,7 @@ export class DepartementVueComponent implements OnInit {
         });
     }
   }
+
   // Ouvrir le modal de suppression multiple
   openDeleteMultipleModal(): void {
     this.showDeleteMultipleModal = true;
@@ -249,11 +282,7 @@ export class DepartementVueComponent implements OnInit {
   confirmDeleteMultiple(): void {
     if (this.selectedUsers.length === 0) return;
 
-    if (
-      confirm(
-        'Êtes-vous sûr de vouloir supprimer les utilisateurs sélectionnés ?'
-      )
-    ) {
+    {
       const deleteRequests = this.selectedUsers.map((user) =>
         this.userService.deleteUser(user.id).toPromise()
       );
@@ -299,30 +328,15 @@ export class DepartementVueComponent implements OnInit {
       const reader = new FileReader(); // Créer un FileReader pour lire le fichier
       reader.onload = (e: any) => {
         const csvData = e.target.result; // Lire les données du fichier
-        const users = this.parseCSV(csvData); // Parser le CSV en tableau d'utilisateurs
-
-        // Appeler le service pour ajouter les utilisateurs
-        this.userService
-          .importUsersFromCSVToDepartement(file, departement_id)
-          .subscribe({
-            next: () => {
-              // Recharger les données du département et des utilisateurs
-              this.loadDepartementAndUsers(departement_id);
-            },
-            error: (error) => {
-              // Gérer les erreurs
-              this.errorMessage =
-                "Erreur lors de l'importation des utilisateurs. Veuillez réessayer.";
-              console.error(error);
-            },
-          });
+        this.importedUsers = this.parseCSV(csvData, departement_id); // Parser le CSV en tableau d'utilisateurs
+        this.showImportModal = true; // Afficher le modal
       };
       reader.readAsText(file); // Lire le fichier comme texte
     }
   }
 
   // Parser un fichier CSV en tableau d'utilisateurs
-  parseCSV(csvData: string): any[] {
+  parseCSV(csvData: string, departement_id: string): any[] {
     const lines = csvData.split('\n');
     const users = [];
     for (let i = 1; i < lines.length; i++) {
@@ -337,11 +351,64 @@ export class DepartementVueComponent implements OnInit {
           adresse,
           photo,
           role: role || 'employé', // Utiliser le rôle du CSV s'il existe, sinon "employé" par défaut
-          departement_id: this.departement.id,
+          departement_id: departement_id,
+          selected: true, // Par défaut, l'utilisateur est sélectionné
         });
       }
     }
     return users;
+  }
+
+  // Fermer le modal d'importation
+  closeImportModal(): void {
+    this.showImportModal = false;
+    this.importedUsers = []; // Réinitialiser la liste des utilisateurs importés
+  }
+
+  // Confirmer l'importation des utilisateurs sélectionnés
+  // Méthode pour convertir un tableau d'utilisateurs en CSV
+  convertToCSV(users: any[]): string {
+    const headers = ['nom', 'prenom', 'email', 'telephone', 'adresse', 'photo'];
+    const rows = users.map((user) =>
+      headers.map((header) => user[header]).join(',')
+    );
+    return [headers.join(','), ...rows].join('\n');
+  }
+
+  // Méthode pour créer un fichier CSV à partir d'une chaîne CSV
+  createCSVFile(csvContent: string): File {
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    return new File([blob], 'users.csv', { type: 'text/csv' });
+  }
+
+  // Confirmer l'importation des utilisateurs sélectionnés
+  confirmImport(departement_id: string): void {
+    const usersToImport = this.importedUsers.filter((user) => user.selected);
+
+    // Convertir le tableau en CSV
+    const csvContent = this.convertToCSV(usersToImport);
+
+    // Créer un fichier CSV
+    const csvFile = this.createCSVFile(csvContent);
+
+    // Appeler le service avec le fichier CSV
+    this.userService
+      .importUsersFromCSVToDepartement(csvFile, departement_id)
+      .subscribe({
+        next: () => {
+          // Recharger les données du département et des utilisateurs
+          this.loadDepartementAndUsers(departement_id);
+          this.importedUsers = []; // Réinitialiser la liste des utilisateurs importés
+          // Fermer le modal après l'importation réussie
+          this.closeImportModal();
+        },
+        error: (error) => {
+          // Gérer les erreurs
+          this.errorMessage =
+            "Erreur lors de l'importation des utilisateurs. Veuillez réessayer.";
+          console.error(error);
+        },
+      });
   }
 
   // Rediriger vers le formulaire d'ajout d'un utilisateur
@@ -377,6 +444,7 @@ export class DepartementVueComponent implements OnInit {
     console.log("Éditer l'utilisateur", user);
     this.redirectToEditUser(user.id); // Redirige vers le formulaire d'édition
   }
+
   // Assigner une carte à un utilisateur
   assignCard(user: any): void {
     console.log('Assigner une carte à', user);

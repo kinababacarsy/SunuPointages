@@ -306,3 +306,16 @@ table tr:nth-child(even) {
 .breadcrumb span {
   color: #6c757d; /* Couleur pour le dernier élément (non cliquable) */
 }
+.status button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.status button:hover {
+  background-color: #0056b3;
+}

@@ -30,9 +30,10 @@ export class DepartementsComponent implements OnInit {
   departementToDelete: any;
   selectedDepartements: any[] = [];
   currentPage: number = 1;
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 5;
   searchQuery: string = '';
   departementsLoaded: boolean = false;
+  allDepartements: any[] = [];
   errorMessage: string | null = null;
   editErrorMessage: string | null = null;
 
@@ -66,32 +67,38 @@ export class DepartementsComponent implements OnInit {
       .getDepartements()
       .then((data) => {
         console.log('Départements chargés:', data);
-        this.departements = data;
-        this.filterDepartements();
+        this.allDepartements = data; // Stocke la liste complète
+        this.departements = data; // Initialise la liste affichée
       })
       .catch((error) => {
         console.error('Erreur lors du chargement des départements', error);
       });
   }
 
+  // Fonction pour normaliser une chaîne et ignorer les accents
+  normalizeString(str: string): string {
+    return str
+      .normalize('NFD') // Décompose les caractères accentués en leurs composants de base
+      .replace(/[\u0300-\u036f]/g, ''); // Supprime les diacritiques (accents)
+  }
+
   // Filtre les départements en fonction de la recherche
   filterDepartements(): void {
     console.log('filterDepartements called with query:', this.searchQuery);
-    if (this.searchQuery.trim() === '') {
-      this.departements = this.departements;
+    const normalizedQuery = this.normalizeString(
+      this.searchQuery.trim().toLowerCase()
+    );
+
+    if (normalizedQuery === '') {
+      // Réinitialise la liste des départements à la liste complète
+      this.departements = this.allDepartements;
     } else {
-      this.departementService
-        .getDepartements()
-        .then((data) => {
-          this.departements = data.filter((departement: any) =>
-            departement.nom_departement
-              .toLowerCase()
-              .includes(this.searchQuery.toLowerCase())
-          );
-        })
-        .catch((error) => {
-          console.error('Erreur lors de la recherche des départements', error);
-        });
+      // Filtre les départements en fonction de la recherche (en ignorant les accents)
+      this.departements = this.allDepartements.filter((departement: any) =>
+        this.normalizeString(
+          departement.nom_departement.toLowerCase()
+        ).includes(normalizedQuery)
+      );
     }
   }
 

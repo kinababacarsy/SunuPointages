@@ -15,6 +15,20 @@ import { NavbarComponent } from '../navbar/navbar.component';
   styleUrls: ['./cohorte-vue.component.css'],
 })
 export class CohorteVueComponent implements OnInit {
+  headers = [
+    'Sélection',
+    'Profil',
+    'Nom et Prénom',
+    'Matricule',
+    'Cohorte',
+    'Téléphone',
+    'Email',
+    'Carte',
+    'Actions',
+    '',
+    '',
+    '',
+  ];
   cohorte: any; // Informations de la cohorte
   users: any[] = []; // Liste complète des apprenants
   filteredUsers: any[] = []; // Liste des apprenants filtrés
@@ -224,11 +238,7 @@ export class CohorteVueComponent implements OnInit {
   confirmDeleteMultiple(): void {
     if (this.selectedUsers.length === 0) return;
 
-    if (
-      confirm(
-        'Êtes-vous sûr de vouloir supprimer les apprenants sélectionnés ?'
-      )
-    ) {
+    {
       const deleteRequests = this.selectedUsers.map((user) =>
         this.userService.deleteUser(user.id).toPromise()
       );

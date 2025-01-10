@@ -75,20 +75,18 @@
     <table>
       <thead>
         <tr>
-          <th>
-            <input
-              type="checkbox"
-              [checked]="selectedUsers.length === filteredUsers.length"
-              (change)="toggleAllSelection()"
-            />
+          <th *ngFor="let header of headers">
+            <ng-container *ngIf="header === 'Sélection'">
+              <input
+                type="checkbox"
+                [checked]="selectedUsers.length === filteredUsers.length"
+                (change)="toggleAllSelection()"
+              />
+            </ng-container>
+            <ng-container *ngIf="header !== 'Sélection'">
+              {{ header }}
+            </ng-container>
           </th>
-          <th>Nom et Prénom</th>
-          <th>Matricule</th>
-          <th>Cohorte</th>
-          <th>Téléphone</th>
-          <th>Email</th>
-          <th>Carte</th>
-          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -110,8 +108,8 @@
               style="cursor: pointer"
               (click)="viewApprenantDetails(user.id)"
             />
-            {{ user.nom }} {{ user.prenom }}
           </td>
+          <td>{{ user.nom }} {{ user.prenom }}</td>
           <td>{{ user.matricule }}</td>
           <td>{{ cohorte?.nom_cohorte }}</td>
           <td>{{ user.telephone }}</td>
@@ -121,25 +119,30 @@
               <i class="fas fa-id-card"></i>
             </button>
           </td>
-          <td class="actions">
+          <td>
             <button
-              class="change-cohorte-btn"
+              class="change-dept-btn"
               (click)="openChangeCohorteModal(user)"
             >
               <i class="fas fa-exchange-alt"></i>
             </button>
+          </td>
+          <td>
             <button class="edit-btn" (click)="editUser(user)">
               <i class="fas fa-edit"></i>
             </button>
+          </td>
+          <td>
             <button class="delete-btn" (click)="openDeleteModal(user)">
               <i class="fas fa-trash"></i>
             </button>
-            <!-- Bouton "Voir les détails" -->
+          </td>
+          <td>
             <button
               class="view-details-btn"
               (click)="viewApprenantDetails(user.id)"
             >
-              <i class="fas fa-eye"></i> Voir les détails
+              <i class="fas fa-eye"></i>Détails
             </button>
           </td>
         </tr>

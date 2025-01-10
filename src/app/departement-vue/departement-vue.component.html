@@ -3,16 +3,12 @@
   <!-- En-tête -->
   <div class="header">
     <div class="breadcrumbs">
-      <!-- Accueil -->
-      <a href="/"> <i class="fas fa-home"></i></a>
-      &gt;
-      <!-- Départements -->
-      <a href="/departements">Départements</a>
-      &gt;
-      <!-- Info (page actuelle) -->
+      <a href="/"> <i class="fas fa-home"></i></a> &gt;
+      <a href="/departements">Départements</a> &gt;
       <span>Info</span>
     </div>
     <div class="actions">
+      <!-- Bouton pour importer un fichier CSV -->
       <input
         type="file"
         (change)="importCSV($event, departement.id)"
@@ -23,9 +19,13 @@
       <button class="import-btn" (click)="csvInput.click()">
         <i class="fas fa-file-import"></i> Importer CSV
       </button>
+
+      <!-- Bouton pour ajouter un nouvel utilisateur -->
       <button class="new-user-btn" (click)="redirectToAddUser()">
         <i class="fas fa-user-plus"></i> Nouveau Utilisateur
       </button>
+
+      <!-- Bouton pour supprimer plusieurs utilisateurs -->
       <button
         class="delete-multiple-btn"
         *ngIf="selectedUsers.length > 1"
@@ -36,7 +36,7 @@
     </div>
   </div>
 
-  <!-- Carte d'information -->
+  <!-- Carte d'information du département -->
   <div class="info-card">
     <div class="info">
       <p>
@@ -79,24 +79,22 @@
     <table>
       <thead>
         <tr>
-          <th>
-            <input
-              type="checkbox"
-              [checked]="selectedUsers.length === filteredUsers.length"
-              (change)="toggleAllSelection()"
-            />
+          <th *ngFor="let header of headers">
+            <ng-container *ngIf="header === 'Sélection'">
+              <input
+                type="checkbox"
+                [checked]="selectedUsers.length === filteredUsers.length"
+                (change)="toggleAllSelection()"
+              />
+            </ng-container>
+            <ng-container *ngIf="header !== 'Sélection'">
+              {{ header }}
+            </ng-container>
           </th>
-          <th>Nom et Prénom</th>
-          <th>Matricule</th>
-          <th>Département</th>
-          <th>Téléphone</th>
-          <th>Email</th>
-          <th>Carte</th>
-          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of filteredUsers">
+        <tr *ngFor="let user of paginatedUsers">
           <td>
             <input
               type="checkbox"
@@ -105,7 +103,6 @@
             />
           </td>
           <td>
-            <!-- Photo cliquable -->
             <img
               [src]="user.photo"
               alt="Profile picture of {{ user.nom }} {{ user.prenom }}"
@@ -114,8 +111,8 @@
               style="cursor: pointer"
               (click)="viewEmployeeDetails(user.id)"
             />
-            {{ user.nom }} {{ user.prenom }}
           </td>
+          <td>{{ user.nom }} {{ user.prenom }}</td>
           <td>{{ user.matricule }}</td>
           <td>{{ departement?.nom_departement }}</td>
           <td>{{ user.telephone }}</td>
@@ -125,22 +122,27 @@
               <i class="fas fa-id-card"></i>
             </button>
           </td>
-          <td class="actions">
+          <td>
             <button class="change-dept-btn" (click)="openChangeDeptModal(user)">
               <i class="fas fa-exchange-alt"></i>
             </button>
+          </td>
+          <td>
             <button class="edit-btn" (click)="editUser(user)">
               <i class="fas fa-edit"></i>
             </button>
+          </td>
+          <td>
             <button class="delete-btn" (click)="openDeleteModal(user)">
               <i class="fas fa-trash"></i>
             </button>
-            <!-- Bouton "Voir les détails" -->
+          </td>
+          <td>
             <button
               class="view-details-btn"
               (click)="viewEmployeeDetails(user.id)"
             >
-              <i class="fas fa-eye"></i> Voir les détails
+              <i class="fas fa-eye"></i> Détails
             </button>
           </td>
         </tr>
@@ -150,7 +152,13 @@
 
   <!-- Pagination -->
   <div class="pagination">
-    <a class="nav-button" (click)="goToPage(currentPage - 1)">Précédent</a>
+    <a
+      class="nav-button"
+      (click)="goToPage(currentPage - 1)"
+      [class.disabled]="currentPage === 1"
+    >
+      Précédent
+    </a>
     <div class="page-controls">
       <button
         *ngFor="let page of pages; let i = index"
@@ -160,7 +168,13 @@
         {{ page }}
       </button>
     </div>
-    <a class="nav-button" (click)="goToPage(currentPage + 1)">Suivant</a>
+    <a
+      class="nav-button"
+      (click)="goToPage(currentPage + 1)"
+      [class.disabled]="currentPage === pages.length"
+    >
+      Suivant
+    </a>
   </div>
 
   <!-- Modal de confirmation de suppression -->
@@ -237,6 +251,47 @@
         </button>
         <button type="button" (click)="confirmChangeDept()" class="btn confirm">
           CONFIRMER
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'importation CSV -->
+  <div class="modal-backdrop" *ngIf="showImportModal">
+    <div class="modal">
+      <header>
+        <h2>Utilisateurs importés</h2>
+      </header>
+      <div class="modal-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Sélection</th>
+              <th>Nom</th>
+              <th>Prénom</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of importedUsers">
+              <td>
+                <input type="checkbox" [(ngModel)]="user.selected" />
+              </td>
+              <td>{{ user.nom }}</td>
+              <td>{{ user.prenom }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="buttons">
+        <button type="button" (click)="closeImportModal()" class="cancel">
+          ANNULER
+        </button>
+        <button
+          type="button"
+          (click)="confirmImport(departement.id)"
+          class="confirm"
+        >
+          IMPORTER
         </button>
       </div>
     </div>

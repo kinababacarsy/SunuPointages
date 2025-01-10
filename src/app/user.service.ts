@@ -17,6 +17,8 @@ export interface User {
   cohorte_id?: string;
   mot_de_passe?: string | null; // Autoriser null
   confirmation_mot_de_passe?: string; // Optionnel (uniquement pour le formulaire)
+  status?: string; // Ajoute cette propriété
+  cartID?: string; // Ajoute cette propriété
 }
 @Injectable({
   providedIn: 'root',
