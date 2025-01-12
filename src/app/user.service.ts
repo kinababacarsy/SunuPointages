@@ -74,20 +74,6 @@ export class UserService {
     });
   }
 
-  // Ajouter un cardID à un utilisateur
-  addCardId(id: string, cardID: string): Observable<User> {
-    return new Observable((observer) => {
-      axios
-        .put(`${this.apiUrl}/users/${id}/add-card`, { cardID })
-        .then((response) => {
-          observer.next(response.data);
-          observer.complete();
-        })
-        .catch((error) => {
-          this.handleError(error).subscribe(observer);
-        });
-    });
-  }
 
   // Ajouter un cardID à un utilisateur
   addCardId(id: string, cardID: string): Observable<User> {

@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { AssignationCarteComponent } from '../assignation-carte/assignation-carte.component';  //import du component d'assignation
+import { AssignationCarteComponent } from '../assignation-carte/assignation-carte.component'; //import du component d'assignation
 
 @Component({
   selector: 'app-departement-vue',
@@ -48,7 +48,7 @@ export class DepartementVueComponent implements OnInit {
   departements: any[] = []; // Liste des départements disponibles
   sortField: string = 'nom'; // Champ de tri
   sortOrder: string = 'asc'; // Ordre de tri
-  importedUsers: any[] = [];
+
   paginatedUsers: any[] = []; // Résultats paginés
   importedUsers: any[] = []; // Utilisateurs importés via CSV
   showImportModal: boolean = false; // Afficher le modal d'importation
@@ -446,13 +446,8 @@ export class DepartementVueComponent implements OnInit {
     console.log("Éditer l'utilisateur", user);
     this.redirectToEditUser(user.id); // Redirige vers le formulaire d'édition
   }
-   // Assigner une carte à un apprenant
+  // Assigner une carte à un apprenant
   assignCard(userId: string) {
     this.router.navigate(['/assignation-carte', userId]);
-
-  // Assigner une carte à un utilisateur
-  assignCard(user: any): void {
-    console.log('Assigner une carte à', user);
-    // Logique pour assigner une carte
   }
 }

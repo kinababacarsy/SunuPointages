@@ -14,7 +14,6 @@ import axios from 'axios';
 })
 // Décorateur Injectable pour indiquer que cette classe peut être injectée dans d'autres classes
 // providedIn: 'root' signifie que le service est disponible dans toute l'application
-
 export class RfidService {
   // Déclaration de la classe RfidService
 
@@ -28,9 +27,8 @@ export class RfidService {
   }
 
   public listen(): Observable<any> {
-    return new Observable((observer) => {
     // Méthode pour écouter les messages du WebSocket
-    return new Observable(observer => {
+    return new Observable((observer) => {
       // Création d'un nouvel Observable
       this.socket.onmessage = (event) => {
         // Événement déclenché lorsque le WebSocket reçoit un message
