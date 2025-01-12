@@ -118,11 +118,13 @@
           <td>{{ user.telephone }}</td>
           <td>{{ user.email }}</td>
           <td>
-            <button class="assign-card-btn" (click)="redirectToAssigneUser()">
+            <!-- bouton redirige vers la page d'assignation-->
+            <button class="assign-card-btn" (click)="assignCard(user.id)">
               <i class="fas fa-id-card"></i>
             </button>
           </td>
-          <td>
+
+          <td class="actions">
             <button class="change-dept-btn" (click)="openChangeDeptModal(user)">
               <i class="fas fa-exchange-alt"></i>
             </button>

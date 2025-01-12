@@ -12,18 +12,23 @@ export interface User {
   telephone: string;
   adresse?: string;
   photo?: string;
+
   role: 'employe' | 'apprenant' | 'admin' | 'vigile';
   departement_id?: string;
   cohorte_id?: string;
+  cardID?: string;
+  status?: string;
   mot_de_passe?: string | null; // Autoriser null
   confirmation_mot_de_passe?: string; // Optionnel (uniquement pour le formulaire)
-  status?: string; // Ajoute cette propriété
-  cartID?: string; // Ajoute cette propriété
+  assignmentDate?: string; // Ajout de la propriété assignmentDate
 }
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
+  checkCardStatus(arg0: any, cardID: string) {
+    throw new Error('Method not implemented.');
+  }
   private apiUrl = 'http://localhost:8000/api'; // URL de votre API
 
   constructor() {}
@@ -59,6 +64,36 @@ export class UserService {
     return new Observable((observer) => {
       axios
         .post(`${this.apiUrl}/ajout/users`, userData)
+        .then((response) => {
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          this.handleError(error).subscribe(observer);
+        });
+    });
+  }
+
+  // Ajouter un cardID à un utilisateur
+  addCardId(id: string, cardID: string): Observable<User> {
+    return new Observable((observer) => {
+      axios
+        .put(`${this.apiUrl}/users/${id}/add-card`, { cardID })
+        .then((response) => {
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          this.handleError(error).subscribe(observer);
+        });
+    });
+  }
+
+  // Ajouter un cardID à un utilisateur
+  addCardId(id: string, cardID: string): Observable<User> {
+    return new Observable((observer) => {
+      axios
+        .put(`${this.apiUrl}/users/${id}/add-card`, { cardID })
         .then((response) => {
           observer.next(response.data);
           observer.complete();
@@ -171,6 +206,21 @@ export class UserService {
     });
   }
 
+  // Récupérer un utilisateur par ID
+  getUserById(id: string): Observable<User> {
+    return new Observable((observer) => {
+      axios
+        .get(`${this.apiUrl}/users/${id}`)
+        .then((response) => {
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          this.handleError(error).subscribe(observer);
+        });
+    });
+  }
+
   // Mettre à jour un utilisateur
   updateUser(id: string, userData: Partial<User>): Observable<User> {
     return new Observable((observer) => {
@@ -223,6 +273,20 @@ export class UserService {
         .get(`${this.apiUrl}/users/cohorte/${cohorteId}`)
         .then((response) => {
           observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          this.handleError(error).subscribe(observer);
+        });
+    });
+  }
+  // Récupérer le nombre d'apprenants dans une cohorte
+  getApprenantCountByCohorte(cohorteId: string): Observable<number> {
+    return new Observable((observer) => {
+      axios
+        .get(`${this.apiUrl}/cohortes/${cohorteId}/apprenant-count`)
+        .then((response) => {
+          observer.next(response.data.count);
           observer.complete();
         })
         .catch((error) => {

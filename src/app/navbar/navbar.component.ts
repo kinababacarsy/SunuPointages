@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 
 import { HttpClient } from '@angular/common/http'; // Import du service HttpClient
+import { HttpClient } from '@angular/common/http'; // Import du service HttpClient
 @Component({
   selector: 'app-navbar',
   imports: [RouterLink],

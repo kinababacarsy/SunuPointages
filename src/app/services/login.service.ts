@@ -15,11 +15,14 @@ export class LoginService {
   // Méthode de connexion
   login(email: string, password: string): Observable<any> {
     const credentials = { email, mot_de_passe: password };
+    const credentials = { email, mot_de_passe: password };
 
     // Envoie les informations de connexion au backend
     return this.http.post<any>(this.apiUrl, credentials).pipe(
       catchError((error) => {
+      catchError((error) => {
         console.error('Erreur de connexion', error);
+        return throwError(error); // Rejeter l'erreur pour la gérer dans le composant
         return throwError(error); // Rejeter l'erreur pour la gérer dans le composant
       })
     );
@@ -34,6 +37,7 @@ export class LoginService {
   // Méthode pour déconnecter l'utilisateur (supprime le token)
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     localStorage.removeItem('user');
     this.router.navigate(['/login']); // Rediriger vers la page de login
   }

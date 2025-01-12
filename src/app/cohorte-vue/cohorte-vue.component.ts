@@ -13,6 +13,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
   imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './cohorte-vue.component.html',
   styleUrls: ['./cohorte-vue.component.css'],
+  providers : [UserService],
 })
 export class CohorteVueComponent implements OnInit {
   headers = [
@@ -352,8 +353,7 @@ export class CohorteVueComponent implements OnInit {
     }
   }
   // Assigner une carte à un apprenant
-  assignCard(user: any): void {
-    console.log('Assigner une carte à', user);
-    // Logique pour assigner une carte
+  assignCard(userId: string) {
+    this.router.navigate(['/assignation-carte', userId]);
   }
 }

@@ -1,0 +1,108 @@
+<!-- assignation-carte.component.html -->
+<div class="app-container">
+  <!-- Conteneur principal de l'application -->
+
+  <main class="main-content">
+    <!-- Contenu principal de la page -->
+
+    <div class="card">
+      <!-- Carte pour l'assignation de carte -->
+
+      <h2 class="card-title">Assignation de carte</h2>
+      <!-- Titre de la carte -->
+
+      <div class="form-grid">
+        <!-- Grille de formulaire -->
+
+        <div class="form-group">
+          <!-- Groupe de formulaire pour le nom complet -->
+          <label>Nom complet</label>
+          <!-- Étiquette pour le champ de nom complet -->
+          <input type="text" [value]="cardData.fullName" readonly class="form-control">
+          <!-- Champ de texte pour le nom complet, en lecture seule, lié à cardData.fullName -->
+        </div>
+
+        <div class="form-group">
+          <!-- Groupe de formulaire pour le matricule -->
+          <label>Matricule</label>
+          <!-- Étiquette pour le champ de matricule -->
+          <input type="text" [value]="cardData.matricule" readonly class="form-control">
+          <!-- Champ de texte pour le matricule, en lecture seule, lié à cardData.matricule -->
+        </div>
+
+        <div class="form-group">
+          <!-- Groupe de formulaire pour le numéro de carte -->
+          <label>Numero de carte</label>
+          <!-- Étiquette pour le champ de numéro de carte -->
+          <input type="text" [(ngModel)]="cardData.cardID" placeholder="Scanner pour recuperérer" class="form-control" [readonly]="!isScanning">
+          <!-- Champ de texte pour le numéro de carte, lié à cardData.cardID, avec un placeholder et en lecture seule si isScanning est faux -->
+          <button class="btn btn-scanner" (click)="scanRFID()">Scanner RFID</button>
+          <!-- Bouton pour scanner le RFID, déclenche la méthode scanRFID() lors du clic -->
+        </div>
+
+        <div class="form-group">
+          <!-- Groupe de formulaire pour la date d'assignation -->
+          <label>Date d'assignation</label>
+          <!-- Étiquette pour le champ de date d'assignation -->
+          <input type="date" [value]="cardData.assignmentDate" readonly class="form-control">
+          <!-- Champ de date pour la date d'assignation, en lecture seule, lié à cardData.assignmentDate -->
+        </div>
+      </div>
+
+      <div class="card-status">
+        <!-- Section pour l'état de la carte -->
+        <label>Etat de la carte</label>
+        <!-- Étiquette pour l'état de la carte -->
+        <div class="status-icon">
+          <!-- Icône de statut -->
+          <span class="checkmark">✓</span>
+          <!-- Icône de coche -->
+        </div>
+      </div>
+
+      <div class="button-group">
+        <!-- Groupe de boutons -->
+        <button class="btn btn-cancel" (click)="cancelAssignment()" style="margin-right: 20px;">Annuler</button>
+        <!-- Bouton pour annuler l'assignation, déclenche la méthode cancelAssignment() lors du clic -->
+        <button class="btn btn-confirm" (click)="openConfirmationModal()">Assigner</button>
+        <!-- Bouton pour ouvrir la modal de confirmation, déclenche la méthode openConfirmationModal() lors du clic -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal de confirmation -->
+<div id="confirmationModal" class="modal">
+  <!-- Modal de confirmation -->
+  <div class="modal-content">
+    <!-- Contenu de la modal -->
+    <h2>Confirmation</h2>
+    <!-- Titre de la modal -->
+    <p>Êtes-vous sûr de vouloir assigner cet utilisateur ?</p>
+    <!-- Message de confirmation -->
+    <div class="modal-actions">
+      <!-- Actions de la modal -->
+      <button class="btn btn-cancel" (click)="closeConfirmationModal()" style="margin-right: 40%;">Non</button>
+      <!-- Bouton pour fermer la modal de confirmation, déclenche la méthode closeConfirmationModal() lors du clic -->
+      <button class="btn btn-confirm" (click)="confirmAssignment()">Oui</button>
+      <!-- Bouton pour confirmer l'assignation, déclenche la méthode confirmAssignment() lors du clic -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal de succès -->
+<div id="successModal" class="modal">
+  <!-- Modal de succès -->
+  <div class="modal-content">
+    <!-- Contenu de la modal -->
+    <h2>Succès</h2>
+    <!-- Titre de la modal -->
+    <p>La carte a été assignée avec succès !</p>
+    <!-- Message de succès -->
+    <div class="modal-actions">
+      <!-- Actions de la modal -->
+      <button class="btn btn-confirm" (click)="closeSuccessModal()">OK</button>
+      <!-- Bouton pour fermer la modal de succès, déclenche la méthode closeSuccessModal() lors du clic -->
+    </div>
+  </div>
+</div>
