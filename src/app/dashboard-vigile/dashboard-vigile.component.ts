@@ -5,6 +5,8 @@ import { WebSocketService } from '../services/websocket.service';  // Import du 
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../user.service';  // Import du service pour récupérer les infos du vigile connecté
+import bodyParser from 'body-parser'; // Importez body-parser
+
 
 @Component({
   selector: 'app-pointage',
