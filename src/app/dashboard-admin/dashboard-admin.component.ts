@@ -1,64 +1,54 @@
-// Importation des décorateurs et des classes nécessaires d'Angular
-import { Component, OnInit } from '@angular/core'; // Décorateur pour créer un composant Angular et interface pour l'initialisation
-import { CommonModule } from '@angular/common'; // Module commun contenant des fonctionnalités Angular de base
-import { DashboardAdminService } from '../dashboard-admin.service'; // Service pour gérer les interactions avec l'API
-import { FormsModule } from '@angular/forms'; // Module pour la gestion des formulaires Angular
-import { Chart } from 'chart.js/auto'; // Bibliothèque pour créer des graphiques
-import { NavbarComponent } from '../navbar/navbar.component'; // Composant Navbar utilisé dans le tableau de bord
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DashboardAdminService } from '../services/dashboard-admin.service';
+import { FormsModule } from '@angular/forms';
+import { Chart } from 'chart.js';
+import { NavbarComponent } from '../navbar/navbar.component';
 
-// Définition de l'interface User représentant un utilisateur
 interface User {
-  matricule: string; // Identifiant unique
-  prenom: string; // Prénom de l'utilisateur
-  nom: string; // Nom de l'utilisateur
-  type: string; // Type d'utilisateur (ex. admin, employé, etc.)
-  createdAt: string; // Date de création du compte
-  departement: string; // Département de l'utilisateur
-  entree: string; // Heure d'entrée
-  sortie: string; // Heure de sortie
-  status: string; // Statut de présence
+  matricule: string;
+  prenom: string;
+  nom: string;
+  type: string;
+  createdAt: string; // Ajout de la propriété createdAt
+  departement: string;
+  entree: string;
+  sortie: string;
+  status: string;
 }
 
-// Interface pour représenter l'historique des présences
 interface Historique {
-  status: string; // Statut (présent, absent, etc.)
-  count: number; // Nombre d'occurrences de ce statut
+  status: string;
+  count: number;
 }
 
-// Interface pour représenter les données de présence
 interface PresenceData {
-  status: string; // Statut de présence
-  count: number; // Nombre d'utilisateurs dans ce statut
+  status: string;
+  count: number;
 }
 
-// Définition des clés valides pour les périodes
 type PeriodKey = 'day' | 'week' | 'month';
 
-// Déclaration du composant Angular
 @Component({
-  selector: 'app-dashboard-admin', // Sélecteur HTML pour le composant
-  standalone: true, // Utilisation de composants autonomes (sans AppModule)
-  imports: [CommonModule, FormsModule, NavbarComponent], // Modules et composants importés
-  templateUrl: './dashboard-admin.component.html', // Template HTML du composant
-  styleUrls: ['./dashboard-admin.component.css'], // Fichier CSS du composant
-  providers: [DashboardAdminService], // Services fournis au composant
+  selector: 'app-dashboard-admin',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NavbarComponent],
+  templateUrl: './dashboard-admin.component.html',
+  styleUrls: ['./dashboard-admin.component.css'],
+  providers: [DashboardAdminService],
 })
 export class DashboardAdminComponent implements OnInit {
-  // Classe du composant
+  date: string = new Date().toLocaleString();
+  presences: User[] = [];
+  filteredPresences: User[] = [];
+  private chart: any;
+  selectedPeriod = 'day';
+  selectedCreatedDate: string = '';
+  currentDate: string = new Date().toISOString().split('T')[0];
+  isFiltered: boolean = false; // Variable pour suivre si un filtre est appliqué
 
-  // Définition des propriétés du composant
-  date: string = new Date().toLocaleString(); // Date et heure actuelle
-  presences: User[] = []; // Liste des présences récupérées
-  filteredPresences: User[] = []; // Liste des présences après filtrage
-  private chart: any; // Référence au graphique
-  selectedPeriod = 'day'; // Période sélectionnée (par défaut : jour)
-  selectedCreatedDate: string = ''; // Date de création sélectionnée
-  currentDate: string = new Date().toISOString().split('T')[0]; // Date actuelle au format ISO
-  isFiltered: boolean = false; // Indicateur si un filtre est appliqué
+  historiques: PresenceData[] = [];
 
-  historiques: PresenceData[] = []; // Données historiques pour le graphique
-
-  // Totaux des utilisateurs par catégories
   totalDepartements: any[] = [];
   totalCohortes: any[] = [];
   totalEmployes: number = 0;
@@ -66,9 +56,9 @@ export class DashboardAdminComponent implements OnInit {
   totalAdmins: number = 0;
   totalVigiles: number = 0;
 
-  // Variables pour la pagination
-  currentPage: number = 1; // Page actuelle
-  itemsPerPage: number = 2; // Nombre d'éléments par page
+  // Variables de pagination
+  currentPage: number = 1;
+  itemsPerPage: number = 2;
 
   // Couleurs pour chaque statut
   private statusColors: Record<string, string> = {
@@ -78,17 +68,13 @@ export class DashboardAdminComponent implements OnInit {
     'congés/voyages': '#ffc107', // Jaune pour congés/voyages
   };
 
-  // Injection du service DashboardAdminService
   constructor(public dashboardAdminService: DashboardAdminService) {}
 
-  // Méthode exécutée à l'initialisation du composant
   ngOnInit(): void {
-    this.fetchCounts(); // Récupération des décomptes des utilisateurs
-    this.fetchUserPresences(); // Récupération des présences des utilisateurs
-    this.initChart(); // Initialisation du graphique
+    this.fetchCounts();
+    this.fetchUserPresences();
+    this.initChart();
   }
-
-  // Méthode pour récupérer les totaux par département, cohorte, etc.
 
   fetchCounts(): void {
     this.dashboardAdminService
@@ -110,8 +96,6 @@ export class DashboardAdminComponent implements OnInit {
       }
     );
   }
-
-  // Méthode pour récupérer les présences des utilisateurs
 
   fetchUserPresences(date?: string): void {
     this.dashboardAdminService.getUserPresences(date).subscribe(
@@ -149,8 +133,6 @@ export class DashboardAdminComponent implements OnInit {
   getTotalPages(): number {
     return Math.ceil(this.filteredPresences.length / this.itemsPerPage);
   }
-
-  // Méthode pour initialiser le graphique
 
   private initChart(): void {
     const ctx = document.getElementById('presenceChart') as HTMLCanvasElement;
@@ -193,8 +175,6 @@ export class DashboardAdminComponent implements OnInit {
     });
   }
 
-  // Méthode pour mettre à jour le graphique avec les nouvelles données
-
   private updateChart(): void {
     if (!this.chart) return;
 
@@ -224,13 +204,9 @@ export class DashboardAdminComponent implements OnInit {
     this.chart.update();
   }
 
-  // Méthode pour calculer le total des présences
-
   calculateTotal(): number {
     return this.historiques.reduce((acc, curr) => acc + curr.count, 0);
   }
-
-  // Méthode pour mettre à jour le graphique en fonction de la période sélectionnée
 
   updateChartPeriod(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
@@ -265,8 +241,6 @@ export class DashboardAdminComponent implements OnInit {
     }
   }
 
-  // Méthode pour filtrer par type d'utilisateur
-
   filterByType(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     const type = selectElement.value;
@@ -277,8 +251,6 @@ export class DashboardAdminComponent implements OnInit {
     this.currentPage = 1; // Reset to the first page
     this.updateChart(); // Mettre à jour le diagramme après le filtrage
   }
-
-  // Méthode pour filtrer par date de création
 
   filterByCreatedDate(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
@@ -291,8 +263,6 @@ export class DashboardAdminComponent implements OnInit {
     this.isFiltered = true; // Mettre à jour la variable de filtrage
     this.currentPage = 1; // Reset to the first page
   }
-
-  // Méthode pour filtrer par prénom ou nom
 
   filterByName(event: Event): void {
     const inputElement = event.target as HTMLInputElement;

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import axios from 'axios';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 // Interface pour typer les données utilisateur
 export interface User {
@@ -31,7 +32,7 @@ export class UserService {
   }
   private apiUrl = 'http://localhost:8000/api'; // URL de votre API
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   // Méthode générique pour gérer les erreurs
   private handleError(error: any): Observable<never> {
@@ -57,6 +58,10 @@ export class UserService {
           this.handleError(error).subscribe(observer);
         });
     });
+  }
+
+  getVigileInfo(): Observable<any> {
+    return this.http.get<any>(this.apiUrl);
   }
 
   // Créer un utilisateur

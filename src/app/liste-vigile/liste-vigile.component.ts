@@ -1,82 +1,73 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { WebSocketService } from '../services/websocket.service';  // Import du service WebSocket
+import { WebSocketService } from '../services/websocket.service'; // Import du service WebSocket
 import { Subscription } from 'rxjs'; // Import pour gérer les abonnements
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // Import du module Router
 import { Router } from '@angular/router'; // Import du Router
-
 
 @Component({
   selector: 'app-liste-vigile',
   templateUrl: './liste-vigile.component.html',
-  styleUrls: ['./liste-vigile.component.css'],
   standalone: true,
-  imports:[FormsModule,CommonModule],
-  styleUrls: ['./liste-vigile.component.css']
+  imports: [FormsModule, CommonModule],
+  styleUrls: ['./liste-vigile.component.css'],
 })
 export class ListeVigileComponent implements OnInit, OnDestroy {
-  pointages: any[] = [];  // Tableau pour stocker les données des pointages
+  pointages: any[] = []; // Tableau pour stocker les données des pointages
   loading: boolean = true;
   error: string = '';
   private webSocketSubscription!: Subscription; // Abonnement WebSocket
 
   constructor(
-    private pointageService: PointageService,
-    private router: Router
-  ) {} // Injection du Router
-
-  constructor(
     private webSocketService: WebSocketService, // Service WebSocket
     private router: Router // Injection du Router pour la navigation
-  ) { }
+  ) {}
   ngOnInit(): void {
     // Abonnez-vous aux messages WebSocket reçus
-    this.webSocketSubscription = this.webSocketService.message$.subscribe((data: any) => {
-      if (data.type === 'card-data' && data.found) {
-        // Lorsque des données de carte RFID sont reçues et valides
-        const userData = data.userData;
+    this.webSocketSubscription = this.webSocketService.message$.subscribe(
+      (data: any) => {
+        if (data.type === 'card-data' && data.found) {
+          // Lorsque des données de carte RFID sont reçues et valides
+          const userData = data.userData;
 
-        // Formater les dates avant de les ajouter au tableau
-        userData.premierPointage.date = this.formatDate(userData.premierPointage.date);
-        userData.dernierPointage.date = this.formatDate(userData.dernierPointage.date);
+          // Formater les dates avant de les ajouter au tableau
+          userData.premierPointage.date = this.formatDate(
+            userData.premierPointage.date
+          );
+          userData.dernierPointage.date = this.formatDate(
+            userData.dernierPointage.date
+          );
 
-        // Vérifiez si l'utilisateur est déjà dans le tableau, sinon ajoutez-le
-        const userIndex = this.pointages.findIndex(pointage => pointage.matricule === userData.matricule);
-        if (userIndex === -1) {
-          // Si l'utilisateur n'existe pas, on l'ajoute
-          this.pointages.push({
-            matricule: userData.matricule,
-            nom: userData.nom,
-            prenom: userData.prenom,
-            premierPointage: userData.premierPointage,
-            dernierPointage: userData.dernierPointage,
-            statut: userData.statut
-          });
-        } else {
-          // Si l'utilisateur existe déjà, on met à jour son dernier pointage
-          this.pointages[userIndex].dernierPointage = userData.dernierPointage;
+          // Vérifiez si l'utilisateur est déjà dans le tableau, sinon ajoutez-le
+          const userIndex = this.pointages.findIndex(
+            (pointage) => pointage.matricule === userData.matricule
+          );
+          if (userIndex === -1) {
+            // Si l'utilisateur n'existe pas, on l'ajoute
+            this.pointages.push({
+              matricule: userData.matricule,
+              nom: userData.nom,
+              prenom: userData.prenom,
+              premierPointage: userData.premierPointage,
+              dernierPointage: userData.dernierPointage,
+              statut: userData.statut,
+            });
+          } else {
+            // Si l'utilisateur existe déjà, on met à jour son dernier pointage
+            this.pointages[userIndex].dernierPointage =
+              userData.dernierPointage;
+          }
+
+          // Désactiver le chargement une fois les données reçues
+          this.loading = false;
+        } else if (data.found === false) {
+          this.error = data.message || 'Erreur : Utilisateur non trouvé';
+          this.loading = false;
         }
-
-        // Désactiver le chargement une fois les données reçues
-        this.loading = false;
-      } else if (data.found === false) {
-        this.error = data.message || 'Erreur : Utilisateur non trouvé';
-        this.loading = false;
       }
-    });
+    );
   }
 
-  getStatusClass(statut: string): string {
-    switch (statut.toLowerCase()) {
-      case "à l'heure":
-        return 'status-ontime';
-      case 'retard':
-        return 'status-late';
-      case 'absent':
-        return 'status-absent';
-      default:
-        return '';
   ngOnDestroy(): void {
     // Se désabonner de WebSocket pour éviter les fuites de mémoire
     if (this.webSocketSubscription) {
@@ -85,12 +76,11 @@ export class ListeVigileComponent implements OnInit, OnDestroy {
   }
 
   onRetour(): void {
-    this.router.navigate(['/dashboard-vigile']); // Redirection vers le dashboard-vigile
     // Redirection vers le dashboard-vigile
     this.router.navigate(['/dashboard-vigile']);
   }
-  // 
-  // 
+  //
+  //
   // Fonction pour formater les dates en 'dd/mm/yyyy'
   formatDate(date: string): string {
     const d = new Date(date);

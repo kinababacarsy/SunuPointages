@@ -11,7 +11,7 @@ import { ApprenantDetailsComponent } from './apprenant-details/apprenant-details
 import { UserFormComponent } from './user-form/user-form.component';
 import { ConnexionVigileComponent } from './connexion-vigile/connexion-vigile.component';
 import { DashboardVigileComponent } from './dashboard-vigile/dashboard-vigile.component';
-import { PointageComponent } from './liste-vigile/liste-vigile.component';
+import { ListeVigileComponent } from './liste-vigile/liste-vigile.component';
 import { ApprenantFormComponent } from './apprenant-form/apprenant-form.component';
 
 // Configuration des routes
@@ -19,7 +19,6 @@ export const routes: Routes = [
   { path: 'dashboard-admin', component: DashboardAdminComponent }, //route pour l'interface de l'admin
   { path: 'departements', component: DepartementsComponent },
   { path: 'cohortes', component: CohortesComponent },
-  { path: 'pointage', component: PointageComponent },
   { path: 'departement/:id', component: DepartementVueComponent },
   { path: 'cohorte/:id', component: CohorteVueComponent }, // Ajouté
   { path: 'employee-details/:id', component: EmployeeDetailsComponent },
@@ -37,6 +36,6 @@ export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' }, // Redirection par défaut
   { path: 'login', component: ConnexionVigileComponent }, // Route vers ConnexionVigile
   { path: 'dashboard-vigile', component: DashboardVigileComponent }, // Route vers DashboardVigile
-  { path: 'liste-vigile', component: PointageComponent }, // Route vers ListeVigile
+  { path: 'liste-vigile', component: ListeVigileComponent }, // Route vers ListeVigile
   { path: 'assignation-carte/:id', component: AssignationCarteComponent }, //route pour assigner une carte à un utilisateur
 ];
