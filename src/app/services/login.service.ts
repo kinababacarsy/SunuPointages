@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -12,7 +12,7 @@ export class LoginService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // Méthode de connexion
+  // Méthode de connexion avec email et mot de passe
   login(email: string, password: string): Observable<any> {
     const credentials = { email, mot_de_passe: password };
 
@@ -21,6 +21,19 @@ export class LoginService {
       catchError((error) => {
         console.error('Erreur de connexion', error);
         return throwError(error); // Rejeter l'erreur pour la gérer dans le composant
+      })
+    );
+  }
+
+  // Méthode de connexion avec cardID (uniquement pour les admins)
+  loginWithCardID(cardID: string): Observable<any> {
+    const credentials = { cardID }; // Envoyer uniquement le cardID pour les admins
+
+    // Envoie la requête pour se connecter avec cardID au backend
+    return this.http.post<any>(this.apiUrl, credentials).pipe(
+      catchError(error => {
+        console.error('Erreur de connexion avec cardID', error);
+        return throwError(error);  // Rejeter l'erreur pour la gérer dans le composant
       })
     );
   }

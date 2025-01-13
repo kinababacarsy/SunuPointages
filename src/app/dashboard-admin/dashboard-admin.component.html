@@ -60,9 +60,9 @@
           <i class="bi bi-calendar text-warning me-2 fs-4"></i>
           <!-- Icône de calendrier -->
           <div>
-            <p class="text-muted mb-0">{{ date.split(',')[0] }}</p>
+            <p class="text-muted mb-0">{{ date.split(",")[0] }}</p>
             <!-- Affichage de la date -->
-            <h4>{{ date.split(',')[1] }}</h4>
+            <h4>{{ date.split(",")[1] }}</h4>
             <!-- Affichage de l'heure -->
           </div>
         </div>
@@ -150,7 +150,10 @@
               <div class="d-flex justify-content-between mb-3">
                 <!-- Conteneur pour les filtres -->
 
-                <select class="form-select me-2" (change)="filterByType($event)">
+                <select
+                  class="form-select me-2"
+                  (change)="filterByType($event)"
+                >
                   <!-- Sélecteur pour filtrer par type -->
                   <option value="all">Tous</option>
                   <!-- Option pour tous les types -->
@@ -160,10 +163,19 @@
                   <!-- Option pour les apprenants -->
                 </select>
 
-                <input type="date" class="form-control me-2" (change)="filterByCreatedDate($event)">
+                <input
+                  type="date"
+                  class="form-control me-2"
+                  (change)="filterByCreatedDate($event)"
+                />
                 <!-- Champ de date pour filtrer par date de création -->
 
-                <input type="text" class="form-control" placeholder="Rechercher nom..." (input)="filterByName($event)">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Rechercher nom..."
+                  (input)="filterByName($event)"
+                />
                 <!-- Champ de texte pour filtrer par nom -->
               </div>
             </div>
@@ -201,7 +213,9 @@
                   <!-- Heure d'entrée -->
                   <td>{{ presence.sortie }}</td>
                   <!-- Heure de sortie -->
-                  <td [class]="presence.status.toLowerCase()">{{ presence.status }}</td>
+                  <td [class]="presence.status.toLowerCase()">
+                    {{ presence.status }}
+                  </td>
                   <!-- Statut avec classe dynamique -->
                 </tr>
               </tbody>
@@ -210,11 +224,21 @@
 
           <div class="pagination-controls">
             <!-- Contrôles de pagination -->
-            <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Précédent</button>
+            <button
+              (click)="changePage(currentPage - 1)"
+              [disabled]="currentPage === 1"
+            >
+              Précédent
+            </button>
             <!-- Bouton Précédent -->
             <span>page {{ currentPage }} </span>
             <!-- Affichage de la page actuelle -->
-            <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === getTotalPages()">Suivant</button>
+            <button
+              (click)="changePage(currentPage + 1)"
+              [disabled]="currentPage === getTotalPages()"
+            >
+              Suivant
+            </button>
             <!-- Bouton Suivant -->
           </div>
         </div>
@@ -230,7 +254,11 @@
             <!-- Conteneur pour le titre et le sélecteur -->
             <h5 class="mb-0">Historique des Pointages</h5>
             <!-- Titre de la carte -->
-            <select class="form-select" style="width: auto;" (change)="updateChartPeriod($event)">
+            <select
+              class="form-select"
+              style="width: auto"
+              (change)="updateChartPeriod($event)"
+            >
               <!-- Sélecteur pour la période du diagramme -->
               <option value="day">Jour</option>
               <!-- Option pour la période jour -->
@@ -253,21 +281,22 @@
               <!-- Boucle pour chaque statistique -->
               <div class="d-flex justify-content-between align-items-center">
                 <!-- Conteneur pour le libellé et la valeur -->
-                <span>{{stat.status | titlecase}}</span>
+                <span>{{ stat.status | titlecase }}</span>
                 <!-- Libellé du statut -->
-                <span class="fw-bold">{{stat.count}}</span>
+                <span class="fw-bold">{{ stat.count }}</span>
                 <!-- Valeur du statut -->
               </div>
               <div class="progress mt-2">
                 <!-- Barre de progression -->
-                <div class="progress-bar"
-                     [ngClass]="{
-                         'bg-success': stat.status === 'present',
-                         'bg-danger': stat.status === 'absent',
-                         'bg-warning': stat.status === 'retard'
-                     }"
-                     [style.width.%]="(stat.count / calculateTotal()) * 100">
-                </div>
+                <div
+                  class="progress-bar"
+                  [ngClass]="{
+                    'bg-success': stat.status === 'present',
+                    'bg-danger': stat.status === 'absent',
+                    'bg-warning': stat.status === 'retard'
+                  }"
+                  [style.width.%]="(stat.count / calculateTotal()) * 100"
+                ></div>
                 <!-- Barre de progression avec classe dynamique -->
               </div>
             </div>

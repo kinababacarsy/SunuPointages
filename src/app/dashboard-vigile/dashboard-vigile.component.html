@@ -7,10 +7,22 @@
     <h1 class="title">SUNU POINTAGE</h1>
     <div class="profile">
       <img
-        class="user-profile"
-        [src]="user?.photo || 'https://via.placeholder.com/150'"
-        alt="User Profile"
+        src="vigile.png"
+        alt="Profile"
+        class="profile-img"
+        (click)="showVigileInfoModal()"
       />
+    </div>
+    <!-- Modal pour afficher les informations du vigile -->
+    <div class="modal" *ngIf="showModal">
+      <div class="modal-content">
+        <span class="close" (click)="closeModal()">&times;</span>
+        <h2>Informations du Vigile</h2>
+        <p><strong>Nom:</strong> {{ vigileData.nom }}</p>
+        <p><strong>Prénom:</strong> {{ vigileData.prenom }}</p>
+        <p><strong>Email:</strong> {{ vigileData.email }}</p>
+        <a (click)="changePassword()">Changer le mot de passe</a>
+      </div>
     </div>
   </header>
 
@@ -44,47 +56,45 @@
       <h2>CONTROLE D'ACCES</h2>
       <div class="control-info">
         <!-- Premier pointage -->
-        <div class="control-item">
+        <div
+          class="control-item"
+          [ngClass]="{
+            approved: employeeData.premierPointage.status === 'approved',
+            rejected: employeeData.premierPointage.status === 'rejected'
+          }"
+        >
           <span class="bold">Premier pointage : </span>
-          <span class="status">{{ employeeData.premierPointage }}</span>
-          <span class="status-icons">
-            <i
-              class="fas fa-check success"
-              *ngIf="employeeData.premierPointage !== 'en attente...'"
-            ></i>
-            <i
-              class="fas fa-times error"
-              *ngIf="employeeData.premierPointage === 'en attente...'"
-            ></i>
-          </span>
+          <span
+            >{{ formatDate(employeeData.premierPointage.date) }}
+            {{ employeeData.premierPointage.heure }}</span
+          >
+          <button class="btn-approve" (click)="approvePointage('premier')">
+            Approuve
+          </button>
+          <button class="btn-reject" (click)="rejectPointage('premier')">
+            Rejete
+          </button>
         </div>
 
         <!-- Dernier pointage -->
-        <div class="control-item">
+        <div
+          class="control-item"
+          [ngClass]="{
+            approved: employeeData.dernierPointage.status === 'approved',
+            rejected: employeeData.dernierPointage.status === 'rejected'
+          }"
+        >
           <span class="bold">Dernier pointage : </span>
-          <span class="status">{{ employeeData.dernierPointage }}</span>
-          <span class="status-icons">
-            <i
-              class="fas fa-check success"
-              *ngIf="employeeData.dernierPointage !== 'en attente...'"
-            ></i>
-            <i
-              class="fas fa-times error"
-              *ngIf="employeeData.dernierPointage === 'en attente...'"
-            ></i>
-          </span>
-        </div>
-
-        <!-- Affichage des pointages -->
-        <div class="pointages">
-          <h3>Historique des Pointages</h3>
-          <ul>
-            <ul>
-              <li *ngFor="let pointage of employeeData.pointages">
-                {{ formatDate(pointage.date) }} - {{ pointage.type }}
-              </li>
-            </ul>
-          </ul>
+          <span
+            >{{ formatDate(employeeData.dernierPointage.date) }}
+            {{ employeeData.dernierPointage.heure }}</span
+          >
+          <button class="btn-approve" (click)="approvePointage('dernier')">
+            Approuver
+          </button>
+          <button class="btn-reject" (click)="rejectPointage('dernier')">
+            Rejeter
+          </button>
         </div>
       </div>
     </div>

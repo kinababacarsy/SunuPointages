@@ -4,270 +4,184 @@ import { HttpClient } from '@angular/common/http';
 import { WebSocketService } from '../services/websocket.service'; // Import du service WebSocket
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale'; // Pour le format français
+import { UserService } from '../user.service'; // Import du service pour récupérer les infos du vigile connecté
+import bodyParser from 'body-parser'; // Importez body-parser
 
 @Component({
   selector: 'app-pointage',
   imports: [CommonModule],
+  standalone: true,
   templateUrl: './dashboard-vigile.component.html',
   styleUrls: ['./dashboard-vigile.component.css'],
 })
 export class DashboardVigileComponent implements OnInit, OnDestroy {
+  // Stocke les données de l'utilisateur à afficher
   employeeData = {
     matricule: 'en attente...',
     nom: 'en attente...',
     prenom: 'en attente...',
     statut: 'en attente...',
-    premierPointage: 'en attente...',
-    dernierPointage: 'en attente...',
-    photo: 'inconnu.png',
-    pointages: [] as { date: string; type: string }[],
+    photo: 'inconnu.png', // Ajouter l'URL de la photo
+    premierPointage: { date: '', heure: '', status: '' },
+    dernierPointage: { date: '', heure: '', status: '' },
   };
 
-  errorMessages: string[] = [];
-  user: any; // Pour stocker les informations de l'utilisateur connecté
-  private messageSubscription!: Subscription;
+  // Ajout des informations du vigile connecté
+  vigileData = {
+    nom: '',
+    prenom: '',
+    email: '',
+  };
+
+  private messageSubscription!: Subscription; // Pour stocker l'abonnement aux messages
+  showModal = false; // Pour contrôler l'affichage du modal
 
   constructor(
     private router: Router,
     private http: HttpClient,
     private websocketService: WebSocketService,
-    private cdr: ChangeDetectorRef
-  ) {
-    // Récupérez les informations de l'utilisateur connecté depuis le localStorage
-    const userData = localStorage.getItem('user');
-    this.user = userData ? JSON.parse(userData) : null;
-  }
+    private cdr: ChangeDetectorRef, // Injectez ChangeDetectorRef
+    private userService: UserService // Service pour récupérer les informations du vigile
+  ) {}
 
   ngOnInit() {
+    // S'abonner aux messages WebSocket
     this.messageSubscription = this.websocketService.message$.subscribe(
       (data: any) => {
         switch (data.type) {
-          case 'check-in':
-            this.handleCheckIn(data);
-            break;
-          case 'check-out':
-            this.handleCheckOut(data);
-            break;
           case 'card-data':
             this.handleCardData(data);
             break;
-          case 'pointages':
-            this.handlePointages(data);
+          case 'control-door':
+            this.handleControlDoor(data);
             break;
           default:
             console.warn('Événement WebSocket non géré:', data);
         }
       }
     );
+
+    // Récupérer les informations du vigile connecté
+    this.getVigileInfo();
   }
 
   ngOnDestroy() {
+    // Désabonnement pour éviter les fuites de mémoire
     if (this.messageSubscription) {
       this.messageSubscription.unsubscribe();
     }
   }
 
-  private handleCheckIn(data: any) {
-    console.log('Données Check-In reçues:', data);
-    const formattedDate = this.formatDate(data.date); // Formater la date
-    this.employeeData.pointages.push({ date: formattedDate, type: 'Check-In' });
-    this.employeeData.premierPointage = formattedDate;
-    this.cdr.detectChanges();
-
-    this.createControleAcces(data).subscribe(
-      (response) => {
-        console.log('Réponse API Check-In:', response);
-        this.errorMessages = [];
-        this.employeeData.premierPointage = this.formatDate(response.heure); // Formater l'heure
-        this.employeeData.statut = response.statut;
-      },
-      (error) => this.handleApiError(error)
-    );
-  }
-
-  private handleCheckOut(data: any) {
-    console.log('Données Check-Out reçues:', data);
-    const formattedDate = this.formatDate(data.date); // Formater la date
-    this.employeeData.dernierPointage = formattedDate;
-    this.cdr.detectChanges();
-
-    this.createControleAcces(data).subscribe(
-      (response) => {
-        console.log('Réponse API Check-Out:', response);
-        this.errorMessages = [];
-        this.employeeData.dernierPointage = this.formatDate(response.heure); // Formater l'heure
-        this.employeeData.statut = response.statut;
-      },
-      (error) => this.handleApiError(error)
-    );
-  }
-  private getPointagesByCardId(cardId: string) {
-    if (!cardId) {
-      console.error('Card ID est invalide ou manquant');
-      this.errorMessages = ['ID de carte invalide ou manquant'];
-      this.cdr.detectChanges();
-      return; // Ne pas continuer si cardId est manquant
-    }
-
-    // Faire la requête HTTP avec le cardId dans l'URL
-    const url = `http://localhost:3000/api/controle-acces/pointages/${cardId}`;
-
-    this.http.get<any>(url).subscribe(
-      (response: any) => {
-        console.log('Pointages récupérés pour la carte ID', cardId, response);
-
-        // Vérification de la réponse et mise à jour des pointages
-        if (
-          response &&
-          response.pointages &&
-          Array.isArray(response.pointages)
-        ) {
-          this.employeeData.pointages = response.pointages;
-
-          // Traitement du Check-In et Check-Out
-          const checkIn = response.pointages.find(
-            (pointage: any) => pointage.type === 'Check-In'
-          );
-          const checkOut = response.pointages.find(
-            (pointage: any) => pointage.type === 'Check-Out'
-          );
-
-          if (checkIn) {
-            const checkInDateTime = this.formatDateTime(
-              checkIn.date,
-              checkIn.heure
-            );
-            this.employeeData.premierPointage = checkInDateTime;
-          } else {
-            this.employeeData.premierPointage = 'Non effectué';
-          }
-
-          if (checkOut) {
-            const checkOutDateTime = this.formatDateTime(
-              checkOut.date,
-              checkOut.heure
-            );
-            this.employeeData.dernierPointage = checkOutDateTime;
-          } else {
-            this.employeeData.dernierPointage = 'Non effectué';
-          }
-
-          this.cdr.detectChanges();
-        } else {
-          console.error('Réponse invalide ou pointages non trouvés');
-          this.errorMessages = ['Aucun pointage trouvé pour cette carte.'];
-          this.cdr.detectChanges();
-        }
-      },
-      (error) => {
-        console.error('Erreur lors de la récupération des pointages', error);
-        this.errorMessages = ['Erreur lors de la récupération des pointages'];
-        this.cdr.detectChanges();
+  // Méthode pour récupérer les informations du vigile connecté
+  getVigileInfo() {
+    this.userService.getVigileInfo().subscribe((data: any) => {
+      if (data) {
+        this.vigileData = {
+          nom: data.nom,
+          prenom: data.prenom,
+          email: data.email,
+        };
+        console.log('Informations du vigile connecté:', this.vigileData);
       }
-    );
+    });
   }
 
-  public formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return format(date, 'dd/MM/yyyy HH:mm', { locale: fr }); // Format français
+  // Fonction pour afficher le modal avec les informations du vigile
+  showVigileInfoModal() {
+    this.showModal = true;
   }
 
-  private formatDateTime(date: string, heure: string): string {
-    const dateParts = date.split('-'); // Séparer la date (yyyy-mm-dd)
-    const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Convertir en jj/mm/aaaa
+  // Fonction pour fermer le modal
+  closeModal() {
+    this.showModal = false;
+  }
 
-    // Retourner la date et l'heure combinées
-    return `${formattedDate} ${heure.substr(0, 5)}`; // Ne prendre que l'heure jusqu'à hh:mm
+  // Logique pour la modification du mot de passe (si nécessaire)
+  changePassword() {
+    // Logique pour rediriger vers la page de changement de mot de passe
+    console.log('Rediriger vers la page de changement de mot de passe');
+    // Exemple: this.router.navigate(['/change-password']);
   }
 
   private handleCardData(data: any) {
     if (data.found) {
       // Mise à jour des informations utilisateur
-      this.employeeData = {
-        ...this.employeeData,
-        matricule: data.userData.matricule || 'en attente...',
-        nom: data.userData.nom || 'en attente...',
-        prenom: data.userData.prenom || 'en attente...',
-        statut: data.userData.statut || 'en attente...',
-        photo: data.userData.photo || 'inconnu.png',
-        premierPointage: data.userData.premierPointage || 'en attente...',
-        dernierPointage: data.userData.dernierPointage || 'en attente...',
-      };
-
-      // Assurez-vous que `cardID` est disponible et valide avant de l'utiliser
-      const cardId = data.userData.cardID;
-      if (cardId) {
-        this.getPointagesByCardId(cardId); // Passer le cardId valide à la méthode
+      if (data.userData.statut === 'Bloque') {
+        // Si l'utilisateur est bloqué, on affiche une image "bloque" et on masque les autres informations
+        this.employeeData = {
+          matricule: '',
+          nom: '',
+          prenom: '',
+          statut: 'Bloqué',
+          photo: 'bloque.jpg', // Image spécifique pour un utilisateur bloqué
+          premierPointage: { date: '', heure: '', status: '' },
+          dernierPointage: { date: '', heure: '', status: '' },
+        };
       } else {
-        console.error("ID de carte manquant dans les données de l'utilisateur");
-        this.errorMessages = ['ID de carte manquant'];
-        this.cdr.detectChanges();
+        // Sinon, on affiche les informations normales
+        this.employeeData = {
+          ...this.employeeData, // Conserver les données existantes
+          matricule: data.userData.matricule || 'en attente...',
+          nom: data.userData.nom || 'en attente...',
+          prenom: data.userData.prenom || 'en attente...',
+          statut: data.userData.statut || 'en attente...',
+          photo: data.userData.photo || 'inconnu.png',
+          premierPointage: data.userData.premierPointage || {
+            date: '',
+            heure: '',
+            status: '',
+          },
+          dernierPointage: data.userData.dernierPointage || {
+            date: '',
+            heure: '',
+            status: '',
+          },
+        };
       }
 
       // Réinitialiser après 10 secondes
       setTimeout(() => this.resetEmployeeData(), 10000);
     } else {
+      // Utilisateur non trouvé
       console.log('Utilisateur non trouvé:', data.message);
       this.employeeData = {
-        ...this.employeeData,
+        ...this.employeeData, // Conserver les données existantes
         matricule: 'Non trouvé',
         nom: 'Non trouvé',
         prenom: 'Non trouvé',
         statut: 'Non trouvé',
         photo: 'Alerte.png',
-        premierPointage: 'Non trouvé',
-        dernierPointage: 'Non trouvé',
+        premierPointage: { date: '', heure: '', status: '' },
+        dernierPointage: { date: '', heure: '', status: '' },
       };
+
+      // Réinitialiser après 10 secondes
       setTimeout(() => this.resetEmployeeData(), 10000);
     }
   }
 
-  private handlePointages(data: any) {
-    if (data && Array.isArray(data.pointages)) {
-      this.employeeData.pointages = data.pointages;
-      this.cdr.detectChanges();
-    } else {
-      console.error('Les données de pointages sont invalides', data);
-    }
+  // Gestion des commandes de contrôle de la porte
+  private handleControlDoor(data: any) {
+    console.log('Commande de contrôle de la porte reçue:', data);
+    // Vous pouvez ajouter des actions supplémentaires ici si nécessaire
   }
 
+  // Réinitialiser les données utilisateur
   private resetEmployeeData() {
+    console.log('Réinitialisation des données utilisateur'); // Log pour débogage
     this.employeeData = {
-      ...this.employeeData,
+      ...this.employeeData, // Conserver les données existantes
       matricule: 'en attente...',
       nom: 'en attente...',
       prenom: 'en attente...',
       statut: 'en attente...',
       photo: 'inconnu.png',
-      premierPointage: 'en attente...',
-      dernierPointage: 'en attente...',
-      pointages: [],
+      premierPointage: { date: '', heure: '', status: '' },
+      dernierPointage: { date: '', heure: '', status: '' },
     };
   }
 
-  private createControleAcces(data: any) {
-    const requestData = {
-      ...data,
-      card_id: this.employeeData.matricule,
-    };
-
-    return this.http.post<any>(
-      'http://localhost:3000/api/controle-acces',
-      requestData
-    );
-  }
-
-  private handleApiError(error: any) {
-    if (error && error.error && error.error.errors) {
-      this.errorMessages = Object.values(error.error.errors);
-    } else {
-      this.errorMessages = ['Une erreur inconnue est survenue.'];
-    }
-    this.cdr.detectChanges();
-  }
-
+  // Méthodes pour contrôler la porte
   ouvrirPorte() {
     console.log('Ouverture porte');
     this.websocketService.sendMessage('control-door', { action: 'open' });
@@ -278,11 +192,15 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     this.websocketService.sendMessage('control-door', { action: 'close' });
   }
 
+  // Navigation
   consulterListe() {
+    console.log('Consultation liste');
     this.router.navigate(['/liste-vigile']);
   }
 
+  // Déconnexion
   deconnexion() {
+    console.log('Déconnexion');
     this.http
       .post(
         'http://localhost:8000/api/logout',
@@ -297,7 +215,42 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
           localStorage.removeItem('token');
           this.router.navigate(['/login']);
         },
-        (error) => console.error('Erreur lors de la déconnexion', error)
+        (error) => {
+          console.error('Erreur lors de la déconnexion', error);
+        }
       );
+  }
+
+  // Fonction pour formater les dates en 'dd/mm/yyyy'
+  formatDate(date: string): string {
+    const d = new Date(date);
+    const day = d.getDate().toString().padStart(2, '0'); // Ajoute un zéro devant le jour si nécessaire
+    const month = (d.getMonth() + 1).toString().padStart(2, '0'); // Mois de 1 à 12
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  // Méthode pour approuver le pointage
+  approvePointage(type: string) {
+    console.log(`Approuver le pointage ${type}`);
+    if (type === 'premier') {
+      this.employeeData.premierPointage.status = 'approved';
+    } else if (type === 'dernier') {
+      this.employeeData.dernierPointage.status = 'approved';
+    }
+    // Logique pour approuver le pointage
+    // Vous pouvez envoyer une requête au serveur pour mettre à jour le statut du pointage
+  }
+
+  // Méthode pour rejeter le pointage
+  rejectPointage(type: string) {
+    console.log(`Rejeter le pointage ${type}`);
+    if (type === 'premier') {
+      this.employeeData.premierPointage.status = 'rejected';
+    } else if (type === 'dernier') {
+      this.employeeData.dernierPointage.status = 'rejected';
+    }
+    // Logique pour rejeter le pointage
+    // Vous pouvez envoyer une requête au serveur pour mettre à jour le statut du pointage
   }
 }

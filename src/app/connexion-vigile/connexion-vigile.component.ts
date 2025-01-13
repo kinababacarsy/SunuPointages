@@ -1,56 +1,117 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+// src/app/connexion-vigile/connexion-vigile.component.ts
+import { Component, OnInit, OnDestroy, isStandalone } from '@angular/core';
+import { Router } from '@angular/router';
+import { LoginService } from '../services/login.service';
+import { CardIdService } from '../../../CONNEXION RFID/card-id.service';
+import { Subscription, interval } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // Pour la navigation après la connexion
-import { LoginService } from '../services/login.service'; // Import du LoginService
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-connexion-vigile',
-  standalone: true,
-  imports: [FormsModule, CommonModule],
   templateUrl: './connexion-vigile.component.html',
+  imports: [CommonModule, FormsModule],
+  standalone: true,
   styleUrls: ['./connexion-vigile.component.css'],
 })
-export class ConnexionVigileComponent {
+export class ConnexionVigileComponent implements OnInit, OnDestroy {
   loginData = {
     email: '',
     password: '',
+    cardID: '',
   };
 
-  errorMessage: string | null = null; // Variable pour afficher un message d'erreur
+  errorMessage: string | null = null;
   showPassword = false;
   showEmailError = false;
   showPasswordError = false;
+  showModal: boolean = false;
+  cardID: string = '';
 
-  constructor(private loginService: LoginService, private router: Router) {}
+  private cardIdSubscription: Subscription | null = null; // Utiliser une union de types
 
-  onSubmit() {
-    // Réinitialiser le message d'erreur
-    this.errorMessage = null;
+  constructor(
+    private loginService: LoginService,
+    private router: Router,
+    private cardIdService: CardIdService
+  ) {}
 
-    // Appel à la méthode login du LoginService
+  ngOnInit(): void {
+    this.cardIdSubscription = interval(1000).subscribe(() => {
+      this.cardIdService.getCardID().subscribe(
+        (response) => {
+          if (response.cardID) {
+            this.cardID = response.cardID;
+            this.loginData.cardID = response.cardID;
+            this.loginWithCardID(response.cardID);
+          }
+        },
+        (error) => {
+          console.error(
+            "Erreur lors de la récupération de l'ID de la carte:",
+            error
+          );
+        }
+      );
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.cardIdSubscription) {
+      this.cardIdSubscription.unsubscribe();
+    }
+  }
+
+  onCardIDClick(): void {
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+  }
+
+  loginWithCardID(cardID: string): void {
+    // console.log('Essai de connexion avec cardID:', cardID);
+    this.loginService.loginWithCardID(cardID).subscribe(
+      (response) => {
+        if (response.role === 'admin') {
+          localStorage.setItem('token', response.token);
+          this.router.navigate(['/dashboard-admin']);
+          // console.log('Utilisateur admin connecté avec cardID');
+        } else {
+          this.errorMessage = "Vous n'avez pas accès avec cette carte";
+        }
+      },
+      (error) => {
+        if (error.status === 401) {
+          this.errorMessage = 'CardID non valide ou non autorisé';
+        } else {
+          this.errorMessage = 'Erreur de connexion, veuillez réessayer';
+        }
+      }
+    );
+  }
+
+  onSubmit(): void {
     this.loginService
       .login(this.loginData.email, this.loginData.password)
       .subscribe(
         (response) => {
-          // Si la connexion réussit, stocke le token et les informations de l'utilisateur dans localStorage
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
-
-          // Rediriger l'utilisateur en fonction de son rôle
-          if (response.user.role === 'admin') {
+          if (response.role === 'admin') {
+            localStorage.setItem('token', response.token);
             this.router.navigate(['/dashboard-admin']);
-          } else if (response.user.role === 'vigile') {
+            // console.log('Utilisateur admin connecté avec email et mot de passe');
+          } else if (response.role === 'vigile') {
+            localStorage.setItem('token', response.token);
             this.router.navigate(['/dashboard-vigile']);
+            console.log(
+              'Utilisateur vigile connecté avec email et mot de passe'
+            );
           } else {
-            // Redirection par défaut si le rôle n'est pas reconnu
-            this.router.navigate(['/departements']);
+            this.errorMessage = 'Rôle non reconnu';
           }
-
-          console.log('Utilisateur connecté');
         },
         (error) => {
-          // Si la connexion échoue, affiche un message d'erreur
           if (error.status === 401) {
             this.errorMessage = 'Email ou mot de passe incorrect';
           } else {
@@ -58,6 +119,10 @@ export class ConnexionVigileComponent {
           }
         }
       );
+  }
+
+  onForgotPassword() {
+    this.router.navigate(['/forgot-password']);
   }
 
   togglePasswordVisibility() {
@@ -68,10 +133,14 @@ export class ConnexionVigileComponent {
     // Vérifie si l'email contient un '@' ou s'il est vide
     this.showEmailError =
       this.loginData.email.length > 0 && !this.loginData.email.includes('@');
+    this.showEmailError =
+      this.loginData.email.length > 0 && !this.loginData.email.includes('@');
   }
 
   onPasswordChange() {
     // Affiche le message d'erreur si le mot de passe est inférieur à 8 caractères
+    this.showPasswordError =
+      this.loginData.password.length > 0 && this.loginData.password.length < 8;
     this.showPasswordError =
       this.loginData.password.length > 0 && this.loginData.password.length < 8;
   }

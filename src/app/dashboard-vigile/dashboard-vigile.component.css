@@ -289,9 +289,88 @@
   object-fit: cover;
   /* Assure que l'image est bien ajustée */
 }
-.user-profile {
-  border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  margin-left: 20px;
+
+.modal {
+  display: block;
+  /* Afficher le modal */
+  position: fixed;
+  /* Position fixe */
+  z-index: 1;
+  /* S'assurer que le modal est au-dessus de tout */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Largeur complète */
+  height: 100%;
+  /* Hauteur complète */
+  overflow: auto;
+  /* Permettre le défilement si nécessaire */
+  background-color: rgb(0, 0, 0);
+  /* Fond noir */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Fond noir avec opacité */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  /* 15% du haut et centré */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  /* Largeur du contenu */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Styles pour le bouton Approuver */
+
+.btn-approve {
+  background-color: green;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* Styles pour le bouton Rejeter */
+
+.btn-reject {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* Styles pour le bloc approuvé */
+
+.approved {
+  background-color: lightgreen;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Styles pour le bloc rejeté */
+
+.rejected {
+  background-color: lightcoral;
+  padding: 10px;
+  border-radius: 5px;
 }

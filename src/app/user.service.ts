@@ -74,7 +74,6 @@ export class UserService {
     });
   }
 
-
   // Ajouter un cardID à un utilisateur
   addCardId(id: string, cardID: string): Observable<User> {
     return new Observable((observer) => {
