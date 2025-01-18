@@ -24,3 +24,4 @@ export class PointageService {
     return this.http.get<Pointage[]>(this.apiUrl);
   }
 }
+

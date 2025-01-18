@@ -5,6 +5,7 @@ import { DashboardAdminService } from '../dashboard-admin.service'; // Service p
 import { FormsModule } from '@angular/forms'; // Module pour la gestion des formulaires Angular
 import { Chart } from 'chart.js/auto'; // Bibliothèque pour créer des graphiques
 import { NavbarComponent } from "../navbar/navbar.component"; // Composant Navbar utilisé dans le tableau de bord
+import { PointageComponent } from '../liste-vigile/liste-vigile.component';
 
 // Définition de l'interface User représentant un utilisateur
 interface User {
@@ -38,7 +39,7 @@ type PeriodKey = 'day' | 'week' | 'month';
 @Component({
   selector: 'app-dashboard-admin', // Sélecteur HTML pour le composant
   standalone: true, // Utilisation de composants autonomes (sans AppModule)
-  imports: [CommonModule, FormsModule, NavbarComponent], // Modules et composants importés
+  imports: [CommonModule, FormsModule, NavbarComponent, PointageComponent], // Modules et composants importés
   templateUrl: './dashboard-admin.component.html', // Template HTML du composant
   styleUrls: ['./dashboard-admin.component.css'], // Fichier CSS du composant
   providers: [DashboardAdminService] // Services fournis au composant
