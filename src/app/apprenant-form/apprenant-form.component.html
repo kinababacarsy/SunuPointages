@@ -1,0 +1,110 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <div class="header">
+        <a (click)="onRetour()" class="back-link">
+            <i class="fas fa-arrow-left"></i> Nouvel apprenant
+        </a>
+    </div>
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <!-- Section Photo de profil -->
+        <div class="form-group">
+            <div class="profile-pic" (click)="triggerFileInput()">
+                <img alt="Profile picture placeholder" height="100" [src]="userForm.get('photo')?.value || 'https://placehold.co/400'" width="100" />
+
+                <i class="fas fa-plus-circle"></i>
+                <input #fileInput type="file" (change)="onFileChange($event)" style="display: none" accept="image/*" />
+            </div>
+            <small *ngIf="userForm.get('photo')?.errors" class="error-message">
+        Veuillez sélectionner une image valide.
+      </small>
+        </div>
+
+        <!-- Section Nom et Prénom -->
+        <div class="form-group">
+            <div class="half-width">
+                <label for="nom">
+          <span class="required">*</span>
+          Nom
+        </label>
+                <input id="nom" formControlName="nom" placeholder="Entrer votre nom" type="text" />
+                <small *ngIf="
+            userForm.get('nom')?.errors?.['required'] &&
+            userForm.get('nom')?.touched
+          " class="error-message">
+          Le nom est obligatoire.
+        </small>
+            </div>
+            <div class="half-width">
+                <label for="prenom">
+          <span class="required">*</span>
+          Prénom
+        </label>
+                <input id="prenom" formControlName="prenom" placeholder="Entrer votre prénom" type="text" />
+                <small *ngIf="
+            userForm.get('prenom')?.errors?.['required'] &&
+            userForm.get('prenom')?.touched
+          " class="error-message">
+          Le prénom est obligatoire.
+        </small>
+            </div>
+        </div>
+
+        <!-- Section Email et Téléphone -->
+        <div class="form-group">
+            <div class="half-width">
+                <label for="email">
+          <span class="required">*</span>
+          Email
+        </label>
+                <input id="email" formControlName="email" placeholder="Entrer votre email" type="email" />
+                <small *ngIf="
+            userForm.get('email')?.errors?.['required'] &&
+            userForm.get('email')?.touched
+          " class="error-message">
+          L'email est obligatoire.
+        </small>
+                <small *ngIf="
+            userForm.get('email')?.errors?.['email'] &&
+            userForm.get('email')?.touched
+          " class="error-message">
+          Veuillez entrer un email valide.
+        </small>
+            </div>
+            <div class="half-width">
+                <label for="telephone">
+          <span class="required">*</span>
+          Téléphone
+        </label>
+                <input id="telephone" formControlName="telephone" placeholder="Entrer votre téléphone" type="text" />
+                <small *ngIf="
+            userForm.get('telephone')?.errors?.['required'] &&
+            userForm.get('telephone')?.touched
+          " class="error-message">
+          Le téléphone est obligatoire.
+        </small>
+            </div>
+        </div>
+
+        <!-- Section Adresse -->
+        <div class="form-group">
+            <div class="full-width">
+                <label for="adresse"> Adresse </label>
+                <input id="adresse" formControlName="adresse" placeholder="Entrer votre adresse" type="text" />
+            </div>
+        </div>
+
+        <!-- Boutons de soumission -->
+        <div class="buttons">
+            <button type="button" class="btn-retour" (click)="onRetour()">
+        RETOUR
+      </button>
+            <button type="submit" class="btn-enregistrer" [disabled]="isLoading || userForm.invalid">
+        <span *ngIf="!isLoading">{{
+          isEditMode ? "Mettre à jour" : "Créer"
+        }}</span>
+        <span *ngIf="isLoading" class="loading-spinner"></span>
+      </button>
+        </div>
+    </form>
+</div>

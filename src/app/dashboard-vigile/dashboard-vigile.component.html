@@ -1,0 +1,83 @@
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="sunuPointage.png" alt="Sunu Pointage" class="logo-img" />
+        </div>
+        <h1 class="title">SUNU POINTAGE</h1>
+        <div class="profile">
+            <img src="vigile.png" alt="Profile" class="profile-img" (click)="showVigileInfoModal()" />
+        </div>
+        <!-- Modal pour afficher les informations du vigile -->
+        <div class="modal" *ngIf="showModal">
+            <div class="modal-content">
+                <span class="close" (click)="closeModal()">&times;</span>
+                <h2>Informations du Vigile</h2>
+                <p><strong>Nom:</strong> {{ vigileData.nom }}</p>
+                <p><strong>Prénom:</strong> {{ vigileData.prenom }}</p>
+                <p><strong>Email:</strong> {{ vigileData.email }}</p>
+                <a (click)="changePassword()">Changer le mot de passe</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Bouton pour consulter la liste -->
+    <div class="list-button">
+        <button class="btn-consult" (click)="consulterListe()">
+      Consulter la liste
+    </button>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="main-content">
+        <!-- Carte de profil -->
+        <div class="profile-card">
+            <div class="profile-image">
+                <img [src]="employeeData.photo || 'inconnu.png'" alt="Profile Picture" />
+            </div>
+            <div class="profile-info">
+                <div class="info-item">Matricule : {{ employeeData.matricule }}</div>
+                <div class="info-item">Nom : {{ employeeData.nom }}</div>
+                <div class="info-item">Prénom : {{ employeeData.prenom }}</div>
+                <div class="info-item">Statut : {{ employeeData.statut }}</div>
+            </div>
+        </div>
+
+        <!-- Carte de contrôle d'accès -->
+        <div class="control-card">
+            <h2>CONTROLE D'ACCES</h2>
+            <div class="control-info">
+                <!-- Premier pointage -->
+                <div class="control-item" [ngClass]="{'approved': employeeData.premierPointage.status === 'approved', 'rejected': employeeData.premierPointage.status === 'rejected'}">
+                    <span class="bold">Premier pointage : </span>
+                    <span>{{ formatDate(employeeData.premierPointage.date) }} {{ employeeData.premierPointage.heure }}</span>
+                    <button class="btn-approve" (click)="approvePointage('premier')">Approuve</button>
+                    <button class="btn-reject" (click)="rejectPointage('premier')">Rejete</button>
+                </div>
+
+                <!-- Dernier pointage -->
+                <div class="control-item" [ngClass]="{'approved': employeeData.dernierPointage.status === 'approved', 'rejected': employeeData.dernierPointage.status === 'rejected'}">
+                    <span class="bold">Dernier pointage : </span>
+                    <span>{{ formatDate(employeeData.dernierPointage.date) }} {{ employeeData.dernierPointage.heure }}</span>
+                    <button class="btn-approve" (click)="approvePointage('dernier')">Approuver</button>
+                    <button class="btn-reject" (click)="rejectPointage('dernier')">Rejeter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons en bas de page -->
+    <div class="bottom-buttons">
+        <button class="btn-open" (click)="ouvrirPorte()">OUVERTURE PORTE</button>
+        <button class="btn-close" (click)="fermerPorte()">FERMETURE PORTE</button>
+        <div class="logout-container">
+            <button class="btn-logout" (click)="deconnexion()">
+        <img
+          src="deconnexion-icone.png"
+          alt="Déconnexion"
+          class="logout-icon"
+        />
+      </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,167 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <!-- En-tête amélioré -->
+    <div class="header">
+        <div class="breadcrumbs">
+            <a href="/"> <i class="fas fa-home"></i></a>&gt;
+            <span>Cohortes</span>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Rechercher une cohorte" [(ngModel)]="searchQuery" (input)="searchCohortes($event)" />
+        </div>
+        <div class="actions">
+            <button class="create-btn" (click)="openCreateModal()">
+        + Créer une Cohorte
+      </button>
+            <button class="delete-btn" *ngIf="selectedCohortes.length > 0" (click)="openDeleteMultipleModal()">
+        Supprimer
+      </button>
+        </div>
+    </div>
+
+    <!-- Tableau des cohortes -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" [checked]="selectedCohortes.length === paginatedCohortes.length" (change)="toggleAllSelection()" />
+                    </th>
+                    <th>Cohortes</th>
+                    <th>Description <i class="fas fa-info-circle"></i></th>
+                    <th>Nombre d'apprenants</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let cohorte of paginatedCohortes">
+                    <td>
+                        <input type="checkbox" [(ngModel)]="cohorte.selected" (change)="toggleSelection(cohorte)" />
+                    </td>
+                    <td>{{ cohorte.nom_cohorte }}</td>
+                    <td>{{ cohorte.description }}</td>
+                    <td>{{ cohorte.nbre_apprenant }}</td>
+                    <td class="actions">
+                        <button class="view-btn" (click)="viewCohorteDetails(cohorte.id)">
+              Voir
+            </button>
+                        <button class="edit-btn" (click)="openEditModal(cohorte)">
+              Modifier
+            </button>
+                        <button class="delete-btn" (click)="openDeleteModal(cohorte)">
+              Supprimer
+            </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <a class="nav-button" (click)="goToPage(currentPage - 1)">Précédent</a>
+        <ul class="pages">
+            <li *ngFor="let page of [].constructor(totalPages); let i = index">
+                <a [class.active]="currentPage === i + 1" (click)="goToPage(i + 1)">{{
+          i + 1
+        }}</a>
+            </li>
+        </ul>
+        <a class="nav-button" (click)="goToPage(currentPage + 1)">Suivant</a>
+    </div>
+</div>
+
+<!-- Modaux (inchangés) -->
+<!-- cohortes.component.html -->
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal">
+        <header>
+            <h2>Créer une Cohorte</h2>
+        </header>
+        <form [formGroup]="cohorteForm" (ngSubmit)="createCohorte($event)">
+            <label for="cohorte-name">Nom de la Cohorte</label>
+            <input type="text" id="cohorte-name" formControlName="nom_cohorte" placeholder="Entrez un nom" [ngClass]="{
+          'error-input': cohorteForm.get('nom_cohorte')?.hasError('unique')
+        }" />
+            <div *ngIf="cohorteForm.get('nom_cohorte')?.hasError('unique')" class="error-message">
+                {{ errorMessage }}
+            </div>
+            <label for="description">Description</label>
+            <textarea id="description" formControlName="description" placeholder="Entrez une description"></textarea>
+            <div class="buttons">
+                <button type="button" (click)="closeModal()" class="cancel">
+          ANNULER
+        </button>
+                <button type="submit" class="confirm">CONFIRMER</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showEditModal">
+    <div class="modal">
+        <header>
+            <h2>Modifier une Cohorte</h2>
+        </header>
+        <form [formGroup]="editCohorteForm" (ngSubmit)="updateCohorte($event)">
+            <label for="edit-cohorte-name">Nom de la Cohorte</label>
+            <input type="text" id="edit-cohorte-name" formControlName="nom_cohorte" placeholder="Entrez un nom" [ngClass]="{
+          'error-input': editCohorteForm.get('nom_cohorte')?.hasError('unique')
+        }" />
+            <div *ngIf="editCohorteForm.get('nom_cohorte')?.hasError('unique')" class="error-message">
+                {{ editErrorMessage }}
+            </div>
+            <label for="edit-description">Description</label>
+            <textarea id="edit-description" formControlName="description" placeholder="Entrez une description"></textarea>
+            <div class="buttons">
+                <button type="button" (click)="closeEditModal()" class="cancel">
+          ANNULER
+        </button>
+                <button type="submit" class="confirm">CONFIRMER</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteModal || showDeleteMultipleModal">
+    <div class="modal">
+        <header>
+            <h2>
+                {{ showDeleteModal ? "Confirmer la suppression" : "Confirmer la suppression multiple" }}
+            </h2>
+        </header>
+        <div class="modal-body">
+            <!-- Message pour la suppression d'une seule cohorte -->
+            <p *ngIf="showDeleteModal && canDeleteCohorte(cohorteToDelete)">
+                Êtes-vous sûr de vouloir supprimer cette cohorte ?
+            </p>
+            <p *ngIf="showDeleteModal && !canDeleteCohorte(cohorteToDelete)">
+                Cette cohorte contient des apprenants, il est impossible de la supprimer.
+            </p>
+
+            <!-- Message pour la suppression multiple de cohortes -->
+            <p *ngIf="showDeleteMultipleModal && canDeleteSelectedCohortes()">
+                Êtes-vous sûr de vouloir supprimer les {{ selectedCohortes.length }} cohortes sélectionnées ?
+            </p>
+            <p *ngIf="showDeleteMultipleModal && hasApprenantsInSelectedCohortes()">
+                Une ou plusieurs cohortes sélectionnées contiennent des apprenants, il est impossible de les supprimer.
+            </p>
+        </div>
+        <div class="buttons">
+            <!-- Bouton Annuler -->
+            <button type="button" (click)="
+          showDeleteModal ? closeDeleteModal() : closeDeleteMultipleModal()
+        " class="cancel">
+        ANNULER
+      </button>
+
+            <!-- Bouton Confirmer (affiché uniquement si la suppression est autorisée) -->
+            <button *ngIf="
+          (showDeleteModal && canDeleteCohorte(cohorteToDelete)) ||
+          (showDeleteMultipleModal && canDeleteSelectedCohortes())
+        " type="button" (click)="showDeleteModal ? confirmDelete() : confirmDeleteMultiple()" class="confirm">
+        CONFIRMER
+      </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,391 @@
+body {
+    font-family: "Roboto", sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header .breadcrumbs {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.header .breadcrumbs a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.header .breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+.header .actions {
+    display: flex;
+    gap: 10px;
+}
+
+.header .actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.header .actions .import-btn {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.header .actions .new-user-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.info-card {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.info-card .info {
+    font-size: 14px;
+}
+
+.info-card .info p {
+    margin: 5px 0;
+}
+
+.info-card .info p span {
+    font-weight: 500;
+}
+
+.search-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-filter .search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-filter .search-box input {
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.search-filter .filter-btn {
+    padding: 10px 20px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th,
+table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+table th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+}
+
+table td img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+table .status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+table .status.active {
+    background-color: #28a745;
+    color: #fff;
+}
+
+table .status.inactive {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+table .actions {
+    display: flex;
+    gap: 10px;
+}
+
+table .actions button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+table .actions .change-dept-btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+table .actions .edit-btn {
+    background-color: #ffc107;
+    color: #fff;
+}
+
+table .actions .delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination .page-info {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.pagination .page-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination .page-controls button {
+    padding: 5px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.pagination .page-controls button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .info-card {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .search-filter {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .header .actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+
+/* Ajoute ces styles pour les icônes et les nouveaux éléments */
+
+.actions button i {
+    margin-right: 5px;
+}
+
+.assign-card-btn {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.change-dept-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background-color: #ffc107;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+
+/* Styles pour le bouton de suppression multiple */
+
+.delete-multiple-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.delete-multiple-btn i {
+    margin-right: 5px;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 400px;
+}
+
+.modal header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal form label {
+    margin-bottom: 5px;
+}
+
+.modal form input,
+.modal form textarea {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.modal .buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal .buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal .buttons .cancel {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.modal .buttons .confirm {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.search-filter {
+    background: white;
+    border: none;
+}
+
+.input-group-text {
+    background-color: white !important;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+}
+
+.form-select:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.select-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.styled-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    appearance: none;
+    background-color: white;
+    font-size: 1em;
+}

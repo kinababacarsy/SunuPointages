@@ -1,0 +1,120 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <!-- Accueil -->
+        <a href="/">
+            <i class="fas fa-home"></i>
+        </a>
+        &gt;
+        <!-- Cohortes -->
+        <a href="/cohortes">Cohortes</a> &gt;
+        <!-- Info (détails de la cohorte) -->
+        <a href="/cohortes">Info</a> &gt;
+        <!-- Apprenant (détails de l'apprenant) -->
+        <span>apprenant</span>
+    </div>
+    <!-- Profile Card -->
+    <div class="profile-card" *ngIf="apprenant">
+        <img [src]="apprenant.photo" alt="Profile picture of the apprenant" height="80" width="80" />
+        <div class="profile-info">
+            <p>Nom et Prénom : {{ apprenant.nom }} {{ apprenant.prenom }}</p>
+            <p>Matricule : {{ apprenant.matricule }}</p>
+            <p>Carte : {{ apprenant.cardID }}</p>
+            <p class="status">
+                Statut : {{ apprenant.status }}
+                <i class="fas fa-check-circle"></i>
+            </p>
+        </div>
+        <button class="absence-button" (click)="openAbsenceModal()">
+      Déclarer une absence
+    </button>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats">
+        <div class="stat-card">
+            <i class="fas fa-clock"></i>
+            <p>Heures de Formation : 120h</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Retards Cumulés : 3h</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-calendar-times"></i>
+            <p>Absences Cumulées : 2 jours</p>
+        </div>
+    </div>
+
+    <!-- Sélection de la semaine -->
+    <div class="week-selector">
+        <button (click)="changeWeek(-1)">Semaine précédente</button>
+        <span>Semaine du {{ weekDates[0] | date : "dd/MM/yyyy" }} au
+      {{ weekDates[4] | date : "dd/MM/yyyy" }}</span
+    >
+    <button (click)="changeWeek(1)">Semaine suivante</button>
+  </div>
+
+  <!-- Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Arrivée</th>
+        <th>Départ</th>
+        <th>Retard</th>
+        <th>Absence</th>
+        <th>Commentaire</th>
+        <th>Teams</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let date of weekDates">
+        <td>{{ date | date : "EEEE dd/MM/yyyy" : "" : "fr" }}</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal d'absence -->
+<div class="modal-overlay" *ngIf="showAbsenceModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Déclarer une nouvelle absence</h2>
+      <span class="close" (click)="closeAbsenceModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+        <div>
+            <label for="start-date">Date de début</label>
+            <input type="date" id="start-date" [(ngModel)]="startDate" placeholder="jj/mm/aaaa" />
+        </div>
+        <div>
+            <label for="end-date">Date de fin</label>
+            <input type="date" id="end-date" [(ngModel)]="endDate" placeholder="jj/mm/aaaa" />
+        </div>
+        <div>
+            <label for="absence-type">Type d'absence</label>
+            <select id="absence-type" [(ngModel)]="absenceType">
+          <option value="maladie">Maladie</option>
+          <option value="voyage">Voyage</option>
+          <option value="congé">Congé</option>
+          <option value="mission">Mission</option>
+        </select>
+        </div>
+        <div>
+            <label for="description">Description</label>
+            <textarea id="description" [(ngModel)]="description" rows="4"></textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button (click)="saveAbsence()">Enregistrer</button>
+    </div>
+</div>
+</div>

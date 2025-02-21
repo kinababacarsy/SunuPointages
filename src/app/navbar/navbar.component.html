@@ -1,26 +1,59 @@
-<header class="header">
-    <div class="logo-section">
-      <img src="assets/logo.png" alt="logo" class="logo-img">
-    </div>
-    
-    <!-- Hamburger menu pour mobile -->
-    <button class="mobile-menu-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+<div class="navbar">
+  <!-- Logo à gauche -->
+  <img class="logo" src="/sunuPointage.png" alt="Logo" />
 
-    <nav class="nav-menu" [class.active]="isMenuOpen">
-      <a routerLink="/departement" routerLinkActive="active">Département</a>
-      <a routerLink="/cohorte" routerLinkActive="active">Cohorte</a>
-      <a routerLink="/pointage" routerLinkActive="active">Pointage</a>
-      <a routerLink="/deconnexion" routerLinkActive="active">
-        Déconnexion 
-        <span class="badge">2</span>
-      </a>
-    </nav>
+  <!-- Liens de navigation (centrés) -->
+  <div class="nav-links">
+    <a class="nav-item" routerLink="/dashboard-admin">
+      <i class="bi bi-house-door"></i> Dashboard
+    </a>
+    <a class="nav-item" routerLink="/departements">
+      <i class="bi bi-building"></i> Départements
+    </a>
+    <a class="nav-item" routerLink="/cohortes">
+      <i class="bi bi-people"></i> Cohortes
+    </a>
+  </div>
+  <!-- Déconnexion à droite -->
+  <a class="nav-item logout" (click)="deconnexion()">
+    DECONNEXION
+    <i class="bi bi-box-arrow-right"></i>
+  </a>
 
-    <div class="profile">
-      <img src="assets/profile.png" alt="Profile" class="profile-img">
+  <!-- Profile Section -->
+  <div class="profile-section">
+    <!-- Image utilisateur avec popup -->
+    <div class="profile-container" (click)="toggleUserPopup($event)">
+      <img
+        class="user-profile"
+        [src]="user?.photo || 'https://via.placeholder.com/150'"
+        alt="User Profile"
+      />
+
+      <!-- Popup utilisateur -->
+      <div
+        class="user-popup"
+        *ngIf="isPopupVisible"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="popup-header">
+          <img
+            [src]="user?.photo || 'https://via.placeholder.com/150'"
+            alt="User Profile"
+            class="popup-photo"
+          />
+          <div class="user-info">
+            <h3>{{ user?.nom }} {{ user?.prenom }}</h3>
+            <p>{{ user?.email }}</p>
+          </div>
+        </div>
+        <div class="popup-content">
+          <div class="role">{{ user?.role }}</div>
+          <button class="logout-btn" (click)="deconnexion()">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+          </button>
+        </div>
+      </div>
     </div>
-  </header>
+  </div>
+</div>

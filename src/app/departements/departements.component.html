@@ -1,0 +1,172 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <!-- En-tête amélioré -->
+    <div class="header">
+        <div class="breadcrumbs">
+            <a href="/"> <i class="fas fa-home"></i></a>&gt;
+            <span>Départements</span>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Rechercher un département" [(ngModel)]="searchQuery" (input)="searchDepartements($event)" />
+        </div>
+        <div class="actions">
+            <button class="create-btn" (click)="openCreateModal()">
+        + Créer un Département
+      </button>
+            <button class="delete-btn" *ngIf="selectedDepartements.length > 0" (click)="openDeleteMultipleModal()">
+        Supprimer
+      </button>
+        </div>
+    </div>
+
+    <!-- Tableau des départements -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" [checked]="
+                selectedDepartements.length === paginatedDepartements.length
+              " (change)="toggleAllSelection()" />
+                    </th>
+                    <th>Départements</th>
+                    <th>Description <i class="fas fa-info-circle"></i></th>
+                    <th>Nombre d'employés</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let departement of paginatedDepartements">
+                    <td>
+                        <input type="checkbox" [(ngModel)]="departement.selected" (change)="toggleSelection(departement)" />
+                    </td>
+                    <td>{{ departement.nom_departement }}</td>
+                    <td>{{ departement.description }}</td>
+                    <td>{{ departement.nbre_employe }}</td>
+                    <td class="actions">
+                        <button class="view-btn" (click)="viewDepartementDetails(departement.id)">
+              Voir
+            </button>
+                        <button class="edit-btn" (click)="openEditModal(departement)">
+              Modifier
+            </button>
+                        <button class="delete-btn" (click)="openDeleteModal(departement)">
+              Supprimer
+            </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <a class="nav-button" (click)="goToPage(currentPage - 1)">Précédent</a>
+        <ul class="pages">
+            <li *ngFor="let page of [].constructor(totalPages); let i = index">
+                <a [class.active]="currentPage === i + 1" (click)="goToPage(i + 1)">{{
+          i + 1
+        }}</a>
+            </li>
+        </ul>
+        <a class="nav-button" (click)="goToPage(currentPage + 1)">Suivant</a>
+    </div>
+</div>
+
+<!-- departement.component.html -->
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal">
+        <header>
+            <h2>Créer un Département</h2>
+        </header>
+        <form [formGroup]="departmentForm" (ngSubmit)="createDepartement($event)">
+            <label for="department-name">Nom du Département</label>
+            <input type="text" id="department-name" formControlName="nom_departement" placeholder="Entrez un nom" [ngClass]="{
+          'error-input': departmentForm
+            .get('nom_departement')
+            ?.hasError('unique')
+        }" />
+            <div *ngIf="departmentForm.get('nom_departement')?.hasError('unique')" class="error-message">
+                {{ errorMessage }}
+            </div>
+            <label for="description">Description</label>
+            <textarea id="description" formControlName="description" placeholder="Entrez une description"></textarea>
+            <div class="buttons">
+                <button type="button" (click)="closeModal()" class="cancel">
+          ANNULER
+        </button>
+                <button type="submit" class="confirm">CONFIRMER</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showEditModal">
+    <div class="modal">
+        <header>
+            <h2>Modifier un Département</h2>
+        </header>
+        <form [formGroup]="editDepartmentForm" (ngSubmit)="updateDepartement($event)">
+            <label for="edit-department-name">Nom du Département</label>
+            <input type="text" id="edit-department-name" formControlName="nom_departement" placeholder="Entrez un nom" [ngClass]="{
+          'error-input': editDepartmentForm
+            .get('nom_departement')
+            ?.hasError('unique')
+        }" />
+            <div *ngIf="editDepartmentForm.get('nom_departement')?.hasError('unique')" class="error-message">
+                {{ editErrorMessage }}
+            </div>
+            <label for="edit-description">Description</label>
+            <textarea id="edit-description" formControlName="description" placeholder="Entrez une description"></textarea>
+            <div class="buttons">
+                <button type="button" (click)="closeEditModal()" class="cancel">
+          ANNULER
+        </button>
+                <button type="submit" class="confirm">CONFIRMER</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteModal || showDeleteMultipleModal">
+    <div class="modal">
+        <header>
+            <h2>
+                {{ showDeleteModal ? "Confirmer la suppression" : "Confirmer la suppression multiple" }}
+            </h2>
+        </header>
+        <div class="modal-body">
+            <!-- Message pour la suppression d'un seul département -->
+            <p *ngIf="showDeleteModal && canDeleteDepartement(departementToDelete)">
+                Êtes-vous sûr de vouloir supprimer ce département ?
+            </p>
+            <p *ngIf="showDeleteModal && !canDeleteDepartement(departementToDelete)">
+                Ce département contient des utilisateurs, il est impossible de le supprimer.
+            </p>
+
+            <!-- Message pour la suppression multiple de départements -->
+            <p *ngIf="showDeleteMultipleModal && canDeleteSelectedDepartements()">
+                Êtes-vous sûr de vouloir supprimer les {{ selectedDepartements.length }} départements sélectionnés ?
+            </p>
+            <p *ngIf="showDeleteMultipleModal && hasUsersInSelectedDepartements()">
+                Un ou plusieurs départements sélectionnés contiennent des utilisateurs, ils ne peuvent pas être supprimés.
+            </p>
+        </div>
+        <div class="buttons">
+            <!-- Bouton Annuler -->
+            <button type="button" (click)="
+          showDeleteModal ? closeDeleteModal() : closeDeleteMultipleModal()
+        " class="cancel">
+        ANNULER
+      </button>
+
+            <!-- Bouton Confirmer (affiché uniquement si la suppression est autorisée) -->
+            <button *ngIf="
+          (showDeleteModal && canDeleteDepartement(departementToDelete)) ||
+          (showDeleteMultipleModal && canDeleteSelectedDepartements())
+        " type="button" (click)="showDeleteModal ? confirmDelete() : confirmDeleteMultiple()" class="confirm">
+        CONFIRMER
+      </button>
+        </div>
+    </div>
+</div>

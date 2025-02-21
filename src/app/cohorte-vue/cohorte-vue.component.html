@@ -1,0 +1,188 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <!-- En-tête -->
+    <div class="header">
+        <div class="breadcrumbs">
+            <!-- Accueil -->
+            <a href="/"> <i class="fas fa-home"></i></a>
+            &gt;
+            <!-- Cohortes -->
+            <a href="/cohortes">Cohortes</a> &gt;
+            <!-- Info (page actuelle) -->
+            <span>Info</span>
+        </div>
+        <div class="actions">
+            <input type="file" (change)="importCSV($event, cohorte.id)" accept=".csv" style="display: none" #csvInput />
+            <button class="import-btn" (click)="csvInput.click()">
+        <i class="fas fa-file-import"></i> Importer CSV
+      </button>
+            <button class="new-user-btn" (click)="redirectToAddUser()">
+        <i class="fas fa-user-plus"></i> Nouveau Utilisateur
+      </button>
+            <button class="delete-multiple-btn" *ngIf="selectedUsers.length > 1" (click)="openDeleteMultipleModal()">
+        <i class="fas fa-trash"></i> Supprimer la sélection
+      </button>
+        </div>
+    </div>
+
+    <!-- Carte d'information -->
+    <div class="info-card">
+        <div class="info">
+            <p><span>Nom de la Cohorte :</span> {{ cohorte?.nom_cohorte }}</p>
+            <p><span>Description :</span> {{ cohorte?.description }}</p>
+            <p><span>Date de création :</span> {{ cohorte?.created_at | date }}</p>
+            <p><span>Nombre d'apprenants :</span> {{ cohorte?.nbre_apprenant }}</p>
+        </div>
+    </div>
+
+    <!-- Barre de recherche et filtres -->
+    <div class="search-filter">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input placeholder="Rechercher par nom, prénom ou matricule" type="text" [(ngModel)]="searchTerm" (input)="filterUsers()" />
+        </div>
+        <div class="filters">
+            <select [(ngModel)]="sortField" (change)="sortUsers()">
+        <option value="nom">Trier par nom</option>
+        <option value="matricule">Trier par matricule</option>
+        <option value="created_at">Trier par date d'ajout</option>
+      </select>
+            <select [(ngModel)]="sortOrder" (change)="sortUsers()">
+        <option value="asc">Croissant</option>
+        <option value="desc">Décroissant</option>
+      </select>
+        </div>
+    </div>
+
+    <!-- Tableau des apprenants -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th *ngFor="let header of headers">
+                        <ng-container *ngIf="header === 'Sélection'">
+                            <input type="checkbox" [checked]="selectedUsers.length === filteredUsers.length" (change)="toggleAllSelection()" />
+                        </ng-container>
+                        <ng-container *ngIf="header !== 'Sélection'">
+                            {{ header }}
+                        </ng-container>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of filteredUsers">
+                    <td>
+                        <input type="checkbox" [checked]="selectedUsers.includes(user)" (change)="toggleSelection(user)" />
+                    </td>
+                    <td>
+                        <!-- Photo cliquable -->
+                        <img [src]="user.photo" alt="Profile picture of {{ user.nom }} {{ user.prenom }}" width="40" height="40" style="cursor: pointer" (click)="viewApprenantDetails(user.id)" />
+                    </td>
+                    <td>{{ user.nom }} {{ user.prenom }}</td>
+                    <td>{{ user.matricule }}</td>
+                    <td>{{ cohorte?.nom_cohorte }}</td>
+                    <td>{{ user.telephone }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+
+                        <!-- bouton redirige vers la page d'assignation-->
+                        <button class="assign-card-btn" (click)="assignCard(user.id)">
+               <i class="fas fa-id-card"></i>
+            </button>
+
+                    </td>
+                    <td>
+                        <button class="change-dept-btn" (click)="openChangeCohorteModal(user)">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+                    </td>
+                    <td>
+                        <button class="edit-btn" (click)="editUser(user)">
+              <i class="fas fa-edit"></i>
+            </button>
+                    </td>
+                    <td>
+                        <button class="delete-btn" (click)="openDeleteModal(user)">
+              <i class="fas fa-trash"></i>
+            </button>
+                    </td>
+                    <td>
+                        <button class="view-details-btn" (click)="viewApprenantDetails(user.id)">
+              <i class="fas fa-eye"></i>Détails
+            </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <a class="nav-button" (click)="goToPage(currentPage - 1)">Précédent</a>
+        <div class="page-controls">
+            <button *ngFor="let page of pages; let i = index" [ngClass]="{ active: currentPage === page }" (click)="goToPage(page)">
+        {{ page }}
+      </button>
+        </div>
+        <a class="nav-button" (click)="goToPage(currentPage + 1)">Suivant</a>
+    </div>
+
+    <!-- Modal de confirmation de suppression -->
+    <div class="modal-backdrop" *ngIf="showDeleteModal || showDeleteMultipleModal">
+        <div class="modal">
+            <header>
+                <h2>
+                    {{ showDeleteModal ? "Confirmer la suppression" : "Confirmer la suppression multiple" }}
+                </h2>
+            </header>
+            <div class="modal-body">
+                <p *ngIf="showDeleteModal">
+                    Êtes-vous sûr de vouloir supprimer cet apprenant ?
+                </p>
+                <p *ngIf="showDeleteMultipleModal">
+                    Êtes-vous sûr de vouloir supprimer les {{ selectedUsers.length }} apprenants sélectionnés ?
+                </p>
+            </div>
+            <div class="buttons">
+                <button type="button" (click)="
+            showDeleteModal ? closeDeleteModal() : closeDeleteMultipleModal()
+          " class="cancel">
+          ANNULER
+        </button>
+                <button type="button" (click)="showDeleteModal ? confirmDelete() : confirmDeleteMultiple()" class="confirm">
+          CONFIRMER
+        </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de changement de cohorte -->
+    <div class="modal-backdrop" *ngIf="showChangeCohorteModal">
+        <div class="modal">
+            <header>
+                <h2>Changer de cohorte</h2>
+            </header>
+            <div class="modal-body">
+                <p class="current-cohorte">
+                    Cohorte actuelle :
+                    <strong>{{ userToChangeCohorte?.cohorte?.nom_cohorte }}</strong>
+                </p>
+                <div class="select-container">
+                    <select [(ngModel)]="newCohorteId" class="styled-select">
+            <option *ngFor="let cohorte of cohortes" [value]="cohorte.id">
+              {{ cohorte.nom_cohorte }}
+            </option>
+          </select>
+                </div>
+            </div>
+            <div class="buttons">
+                <button type="button" (click)="closeChangeCohorteModal()" class="btn cancel">
+          ANNULER
+        </button>
+                <button type="button" (click)="confirmChangeCohorte()" class="btn confirm">
+          CONFIRMER
+        </button>
+            </div>
+        </div>
+    </div>
+</div>
